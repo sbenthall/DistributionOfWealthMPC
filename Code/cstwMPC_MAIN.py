@@ -41,7 +41,7 @@ import os
 
 import numpy as np
 from copy import copy, deepcopy
-from time import clock
+from time import time
 from HARK.utilities import approxMeanOneLognormal, combineIndepDstns, approxUniform, \
                            getPercentiles, getLorenzShares, calcSubpopAvg, approxLognormal
 from HARK.simulation import drawDiscrete

@@ -9,9 +9,9 @@
 #       format_version: '1.2'
 #       jupytext_version: 1.2.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: econ-ark-3.8
 #     language: python
-#     name: python3
+#     name: econ-ark-3.8
 # ---
 
 # %% [markdown]
@@ -30,7 +30,7 @@ import os
 
 # Import related generic python packages
 import numpy as np
-from time import clock
+from time import time
 mystr = lambda number : "{:.4f}".format(number)
 from copy import copy, deepcopy
 
