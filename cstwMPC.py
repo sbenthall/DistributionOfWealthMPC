@@ -21,7 +21,7 @@
 # %% [markdown]
 # This notebook presents a selection of results from the paper [The Distribution of Wealth and the Marginal Propensity to Consume](http://econ.jhu.edu/people/ccarroll/papers/cstwMPC), using the [Econ-ARK/HARK](https://github.com/econ-ark/HARK) toolkit.  It sketches the steps that would need to be taken to solve the model using the [dolARK](https://github.com/EconForge/dolARK) modeling system.
 
-# %% {"code_folding": [0]}
+# %% {"code_folding": []}
 # This cell does some standard python setup
 
 # Tools for navigating the filesystem

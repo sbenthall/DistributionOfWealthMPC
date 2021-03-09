@@ -42,11 +42,10 @@ import os
 import numpy as np
 from copy import copy, deepcopy
 from time import time
-from HARK.utilities import approxMeanOneLognormal, combineIndepDstns, approxUniform, \
-                           getPercentiles, getLorenzShares, calcSubpopAvg, approxLognormal
-from HARK.simulation import drawDiscrete
+from HARK.distribution import MeanOneLogNormal, Uniform
+from HARK.utilities import get_percentiles, get_lorenz_shares, calc_subpop_avg
 from HARK import Market
-import HARK.ConsumptionSaving.ConsIndShockModel as Model
+import HARK.ConsumptionSaving.ConsIndShockModel as ConsIndShockModel
 from HARK.ConsumptionSaving.ConsAggShockModel import CobbDouglasEconomy, AggShockConsumerType
 from scipy.optimize import brentq, minimize_scalar
 import matplotlib.pyplot as plt
@@ -91,7 +90,7 @@ if do_agg_shocks:
     EstimationAgentClass = AggShockConsumerType
     EstimationMarketClass = CobbDouglasEconomy
 else:
-    EstimationAgentClass = Model.IndShockConsumerType
+    EstimationAgentClass = ConsIndShockModel.IndShockConsumerType
     EstimationMarketClass = Market
 
 class cstwMPCagent(EstimationAgentClass):
@@ -110,31 +109,6 @@ class cstwMPCagent(EstimationAgentClass):
         if hasattr(self,'kGrid'):
             self.pLvl = self.pLvlNow/np.mean(self.pLvlNow)
         self.simulate(1)
-
-    def updateIncomeProcess(self):
-        '''
-        An alternative method for constructing the income process in the infinite horizon model.
-
-        Parameters
-        ----------
-        none
-
-        Returns
-        -------
-        none
-        '''
-        if self.cycles == 0:
-            tax_rate = (self.IncUnemp*self.UnempPrb)/((1.0-self.UnempPrb)*self.IndL)
-            TranShkDstn     = deepcopy(approxMeanOneLognormal(self.TranShkCount,sigma=self.TranShkStd[0],tail_N=0))
-            TranShkDstn[0]  = np.insert(TranShkDstn[0]*(1.0-self.UnempPrb),0,self.UnempPrb)
-            TranShkDstn[1]  = np.insert(TranShkDstn[1]*(1.0-tax_rate)*self.IndL,0,self.IncUnemp)
-            PermShkDstn     = approxMeanOneLognormal(self.PermShkCount,sigma=self.PermShkStd[0],tail_N=0)
-            self.IncomeDstn = [combineIndepDstns(PermShkDstn,TranShkDstn)]
-            self.TranShkDstn = TranShkDstn
-            self.PermShkDstn = PermShkDstn
-            self.addToTimeVary('IncomeDstn')
-        else: # Do the usual method if this is the lifecycle model
-            EstimationAgentClass.updateIncomeProcess(self)
 
 class cstwMPCmarket(EstimationMarketClass):
     '''
