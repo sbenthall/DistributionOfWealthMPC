@@ -230,7 +230,7 @@ init_infinite = {"CRRA":CRRA,
                 'AgentCount':0, # will be overwritten by parameter distributor
                 }
 
-# Make a base dictionary for the cstwMPCmarket
+# Make a base dictionary for the CstwMPCMarket
 init_market = {'LorenzBool': False,
                'ManyStatsBool': False,
                'ignore_periods':0,    # Will get overwritten
