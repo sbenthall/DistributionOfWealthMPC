@@ -98,8 +98,15 @@ class CstwMPCAgent(EstimationAgentClass):
     A slight extension of the idiosyncratic consumer type for the cstwMPC model.
     '''
     def reset(self):
-        self.initializeSim()
-        self.t_age = drawDiscrete(self.AgentCount,P=self.AgeDstn,X=np.arange(self.AgeDstn.size),exact_match=False,seed=self.RNG.randint(0,2**31-1)).astype(int)
+        self.initialize_sim()
+        self.t_age = DiscreteDistribution(
+            self.AgeDstn,
+            np.arange(self.AgeDstn.size),
+            seed = self.RNG.randint(0,2**31-1)
+        ).draw(
+            self.AgentCount,
+            exact_match=False
+        ).astype(int)
         self.t_cycle = copy(self.t_age)
         if hasattr(self,'kGrid'):
             self.aLvlNow = self.kInit*np.ones(self.AgentCount) # Start simulation near SS
