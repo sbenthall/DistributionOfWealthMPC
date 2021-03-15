@@ -1,0 +1,27 @@
+cff-version: 1.1.0
+message: If you use this software, please cite it as below.
+authors:
+  - family-names: Benthall
+    given-names: Sebastian
+    orcid: https://orcid.org/0000-0002-1789-5109
+  - family-names: Carroll
+    given-names: Christopher
+references:
+  - type: article
+    authors:
+      - family-names: Carroll
+        given-names: Christopher
+      - family-names: Slacalek
+        given-names: Jiri
+      - family-names: Tokuoka
+        given-names: Kiichi
+      - family-names: White
+        given-names: Matthew
+    title : "The distribution of wealth and the marginal propensity to consume"
+    journal: Quantitative Economics
+    year: 2017
+    doi: https://doi.org/10.3982/QE694
+title: "The distribution of wealth and marginal propensity to consume REMARK"
+version: 1.0
+#doi: 
+date-released: 2021-xx-xx
