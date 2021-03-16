@@ -177,19 +177,19 @@ exec(open('cstwMPC_MAIN.py').read())
 
 # %%
 # Get some tools for plotting simulated vs actual wealth distributions
-from HARK.utilities import getLorenzShares, getPercentiles
+from HARK.utilities import get_lorenz_shares, get_percentiles
 
 # The cstwMPC model conveniently has data on the wealth distribution 
 # from the U.S. Survey of Consumer Finances
-from HARK.cstwMPC.SetupParamsCSTW import SCF_wealth, SCF_weights
+from SetupParamsCSTW import SCF_wealth, SCF_weights
 
 # Construct the Lorenz curves and plot them
 
 pctiles = np.linspace(0.001,0.999,15)
-SCF_Lorenz_points = getLorenzShares(SCF_wealth,weights=SCF_weights,percentiles=pctiles)
+SCF_Lorenz_points = get_lorenz_shares(SCF_wealth,weights=SCF_weights,percentiles=pctiles)
 
-sim_wealth = EstimationEconomy.aLvlNow[0]
-sim_Lorenz_points = getLorenzShares(sim_wealth,percentiles=pctiles)
+sim_wealth = EstimationEconomy.reap_state['aLvl'][0]
+sim_Lorenz_points = get_lorenz_shares(sim_wealth,percentiles=pctiles)
 
 # Plot 
 plt.figure(figsize=(5,5))
@@ -254,3 +254,5 @@ plt.ylabel('Cumulative share of wealth')
 plt.legend(loc=2)
 plt.ylim([0,1])
 plt.show('wealth_distribution_2')
+
+# %%
