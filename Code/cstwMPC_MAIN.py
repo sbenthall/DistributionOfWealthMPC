@@ -121,9 +121,9 @@ class CstwMPCMarket(EstimationMarketClass):
     '''
     A class for representing the economy in the cstwMPC model.
     '''
-    reap_vars = ['aLvl','pLvl','MPC','TranShk','EmpNow','t_age']
+    reap_vars = ['aLvl','pLvl','MPCnow','TranShk','EmpNow','t_age']
     sow_vars  = [] # Nothing needs to be sent back to agents in the idiosyncratic shocks version
-    const_vars = ['LorenzBool','ManyStatsBool']
+    const_vars = [] # ['LorenzBool','ManyStatsBool']
     track_vars = ['MaggNow','AaggNow','KtoYnow','Lorenz','LorenzLong','MPCall','MPCretired','MPCemployed','MPCunemployed','MPCbyIncome','MPCbyWealthRatio','HandToMouthPct']
     dyn_vars = [] # No dynamics in the idiosyncratic shocks version
 
@@ -139,11 +139,11 @@ class CstwMPCMarket(EstimationMarketClass):
             self.sow_vars=['MaggNow','AaggNow','RfreeNow','wRteNow','PermShkAggNow','TranShkAggNow','KtoLnow']
             self.dyn_vars=['AFunc']
             self.max_loops = 20
-        
+
         # Save the current file's directory location for writing output:
         self.my_file_path = path_to_models
 
-        
+
     def solve(self):
         '''
         Solves the CstwMPCMarket.
@@ -158,6 +158,14 @@ class CstwMPCMarket(EstimationMarketClass):
 
     def reap(self):
         super().reap()
+
+        if 'MPCnow' in self.reap_vars:
+            harvest = []
+
+            for agent in self.agents:
+                harvest.append(agent.MPCnow)
+
+            self.reap_state['MPCnow'] = harvest
 
         if 't_age' in self.reap_vars:
             harvest = []
@@ -187,18 +195,38 @@ class CstwMPCMarket(EstimationMarketClass):
             if shock:
                 self.reap_state[var] = harvest
 
-    def mill_rule(self,aLvl,pLvl,MPC,TranShk,EmpNow,t_age,LorenzBool,ManyStatsBool):
+    def mill_rule(self,aLvl,pLvl,MPCnow,TranShk,EmpNow,t_age):
         '''
         The mill_rule for this class simply calls the method calc_stats.
         '''
-        self.calc_stats(aLvl,pLvl,MPC,TranShk,EmpNow,t_age,LorenzBool,ManyStatsBool)
+        self.calc_stats(
+            aLvl,
+            pLvl,
+            MPCnow,
+            TranShk,
+            EmpNow,
+            t_age,
+            self.parameters['LorenzBool'],
+            self.parameters['ManyStatsBool']
+        )
+
         if self.AggShockBool:
             return self.calcRandW(aLvl,pLvl)
         else: # These variables are tracked but not created in no-agg-shocks specifications
             self.MaggNow = 0.0
             self.AaggNow = 0.0
 
-    def calc_stats(self,aLvlNow,pLvlNow,MPCnow,TranShkNow,EmpNow,t_age,LorenzBool,ManyStatsBool):
+    def calc_stats(
+            self,
+            aLvlNow,
+            pLvlNow,
+            MPCnow,
+            TranShkNow,
+            EmpNow,
+            t_age,
+            LorenzBool,
+            ManyStatsBool
+    ):
         '''
         Calculate various statistics about the current population in the economy.
 
@@ -249,6 +277,7 @@ class CstwMPCMarket(EstimationMarketClass):
             CohortWeight = CohortWeight[order]
             wealth_shares = get_lorenz_shares(aLvl,weights=CohortWeight,percentiles=self.LorenzPercentiles,presorted=True)
             self.Lorenz = wealth_shares
+
             if ManyStatsBool:
                 self.LorenzLong = get_lorenz_shares(aLvl,weights=CohortWeight,percentiles=np.arange(0.01,1.0,0.01),presorted=True)
         else:
@@ -372,6 +401,7 @@ class CstwMPCMarket(EstimationMarketClass):
         # Ignore the first X periods to allow economy to stabilize from initial conditions
         KYratioSim = np.mean(np.array(self.history['KtoYnow'])[self.ignore_periods:])
         diff = KYratioSim - self.KYratioTarget
+
         return diff
 
     def calc_lorenz_distance(self):
@@ -390,6 +420,10 @@ class CstwMPCMarket(EstimationMarketClass):
         LorenzSim = np.mean(np.array(self.history['Lorenz'])[self.ignore_periods:],axis=0)
         dist = np.sqrt(np.sum((100*(LorenzSim - self.LorenzTarget))**2))
         self.LorenzDistance = dist
+
+        if np.isnan(dist):
+            breakpoint()
+
         return dist
 
     def show_many_stats(self,spec_name=None):
@@ -411,10 +445,9 @@ class CstwMPCMarket(EstimationMarketClass):
         MPCemployed = np.mean(self.history['MPCemployed'][self.ignore_periods:])
         MPCunemployed = np.mean(self.history['MPCunemployed'][self.ignore_periods:])
         MPCretired = np.mean(self.history['MPCretired'][self.ignore_periods:])
-        # TODO: These are supposed to be 2-D arrays but instead they are list lists of nan
-        #MPCbyIncome = np.mean(np.array(self.history['MPCbyIncome'])[self.ignore_periods:,:],axis=0)
-        #MPCbyWealthRatio = np.mean(np.array(self.history['MPCbyWealthRatio'])[self.ignore_periods:,:],axis=0)
-        #HandToMouthPct = np.mean(np.array(self.history['HandToMouthPct'])[self.ignore_periods:,:],axis=0)
+        MPCbyIncome = np.mean(np.array(self.history['MPCbyIncome'])[self.ignore_periods:,:],axis=0)
+        MPCbyWealthRatio = np.mean(np.array(self.history['MPCbyWealthRatio'])[self.ignore_periods:,:],axis=0)
+        HandToMouthPct = np.mean(np.array(self.history['HandToMouthPct'])[self.ignore_periods:,:],axis=0)
 
         LorenzSim = np.hstack((np.array(0.0),np.mean(np.array(self.history['LorenzLong'])[self.ignore_periods:],axis=0),np.array(1.0)))
         LorenzAxis = np.arange(101,dtype=float)
@@ -439,29 +472,29 @@ class CstwMPCMarket(EstimationMarketClass):
         results_string = 'Estimate is center=' + str(self.center_estimate) + ', spread=' + str(self.spread_estimate) + '\n'
         results_string += 'Lorenz distance is ' + str(self.LorenzDistance) + '\n'
         results_string += 'Average MPC for all consumers is ' + mystr(MPCall) + '\n'
-        #results_string += 'Average MPC in the top percentile of W/Y is ' + mystr(MPCbyWealthRatio[0]) + '\n'
-        #results_string += 'Average MPC in the top decile of W/Y is ' + mystr(MPCbyWealthRatio[1]) + '\n'
-        #results_string += 'Average MPC in the top quintile of W/Y is ' + mystr(MPCbyWealthRatio[2]) + '\n'
-        #results_string += 'Average MPC in the second quintile of W/Y is ' + mystr(MPCbyWealthRatio[3]) + '\n'
-        #results_string += 'Average MPC in the middle quintile of W/Y is ' + mystr(MPCbyWealthRatio[4]) + '\n'
-        #results_string += 'Average MPC in the fourth quintile of W/Y is ' + mystr(MPCbyWealthRatio[5]) + '\n'
-        #results_string += 'Average MPC in the bottom quintile of W/Y is ' + mystr(MPCbyWealthRatio[6]) + '\n'
-        #results_string += 'Average MPC in the top percentile of y is ' + mystr(MPCbyIncome[0]) + '\n'
-        #results_string += 'Average MPC in the top decile of y is ' + mystr(MPCbyIncome[1]) + '\n'
-        #results_string += 'Average MPC in the top quintile of y is ' + mystr(MPCbyIncome[2]) + '\n'
-        #results_string += 'Average MPC in the second quintile of y is ' + mystr(MPCbyIncome[3]) + '\n'
-        #results_string += 'Average MPC in the middle quintile of y is ' + mystr(MPCbyIncome[4]) + '\n'
-        #results_string += 'Average MPC in the fourth quintile of y is ' + mystr(MPCbyIncome[5]) + '\n'
-        #results_string += 'Average MPC in the bottom quintile of y is ' + mystr(MPCbyIncome[6]) + '\n'
+        results_string += 'Average MPC in the top percentile of W/Y is ' + mystr(MPCbyWealthRatio[0]) + '\n'
+        results_string += 'Average MPC in the top decile of W/Y is ' + mystr(MPCbyWealthRatio[1]) + '\n'
+        results_string += 'Average MPC in the top quintile of W/Y is ' + mystr(MPCbyWealthRatio[2]) + '\n'
+        results_string += 'Average MPC in the second quintile of W/Y is ' + mystr(MPCbyWealthRatio[3]) + '\n'
+        results_string += 'Average MPC in the middle quintile of W/Y is ' + mystr(MPCbyWealthRatio[4]) + '\n'
+        results_string += 'Average MPC in the fourth quintile of W/Y is ' + mystr(MPCbyWealthRatio[5]) + '\n'
+        results_string += 'Average MPC in the bottom quintile of W/Y is ' + mystr(MPCbyWealthRatio[6]) + '\n'
+        results_string += 'Average MPC in the top percentile of y is ' + mystr(MPCbyIncome[0]) + '\n'
+        results_string += 'Average MPC in the top decile of y is ' + mystr(MPCbyIncome[1]) + '\n'
+        results_string += 'Average MPC in the top quintile of y is ' + mystr(MPCbyIncome[2]) + '\n'
+        results_string += 'Average MPC in the second quintile of y is ' + mystr(MPCbyIncome[3]) + '\n'
+        results_string += 'Average MPC in the middle quintile of y is ' + mystr(MPCbyIncome[4]) + '\n'
+        results_string += 'Average MPC in the fourth quintile of y is ' + mystr(MPCbyIncome[5]) + '\n'
+        results_string += 'Average MPC in the bottom quintile of y is ' + mystr(MPCbyIncome[6]) + '\n'
         results_string += 'Average MPC for the employed is ' + mystr(MPCemployed) + '\n'
         results_string += 'Average MPC for the unemployed is ' + mystr(MPCunemployed) + '\n'
         results_string += 'Average MPC for the retired is ' + mystr(MPCretired) + '\n'
         results_string += 'Of the population with the 1/3 highest MPCs...' + '\n'
-        #results_string += mystr(HandToMouthPct[0]*100) + '% are in the bottom wealth quintile,' + '\n'
-        #results_string += mystr(HandToMouthPct[1]*100) + '% are in the second wealth quintile,' + '\n'
-        #results_string += mystr(HandToMouthPct[2]*100) + '% are in the third wealth quintile,' + '\n'
-        #results_string += mystr(HandToMouthPct[3]*100) + '% are in the fourth wealth quintile,' + '\n'
-        #results_string += 'and ' + mystr(HandToMouthPct[4]*100) + '% are in the top wealth quintile.' + '\n'
+        results_string += mystr(HandToMouthPct[0]*100) + '% are in the bottom wealth quintile,' + '\n'
+        results_string += mystr(HandToMouthPct[1]*100) + '% are in the second wealth quintile,' + '\n'
+        results_string += mystr(HandToMouthPct[2]*100) + '% are in the third wealth quintile,' + '\n'
+        results_string += mystr(HandToMouthPct[3]*100) + '% are in the fourth wealth quintile,' + '\n'
+        results_string += 'and ' + mystr(HandToMouthPct[4]*100) + '% are in the top wealth quintile.' + '\n'
         print(results_string)
 
         # Save results to disk
@@ -593,7 +626,7 @@ def calc_stationary_age_dstn(LivPrb,terminal_period):
 ###############################################################################
 
 if __name__ == '__main__':
-  
+
     # Set targets for K/Y and the Lorenz curve based on the data
     if do_liquid:
         lorenz_target = np.array([0.0, 0.004, 0.025,0.117])
@@ -603,7 +636,7 @@ if __name__ == '__main__':
         lorenz_long_data = np.hstack((np.array(0.0),get_lorenz_shares(Params.SCF_wealth,weights=Params.SCF_weights,percentiles=np.arange(0.01,1.0,0.01).tolist()),np.array(1.0)))
         #lorenz_target = np.array([-0.002, 0.01, 0.053,0.171])
         KY_target = 10.26
-        
+
     # Set total number of simulated agents in the population
     if do_param_dist:
         if do_agg_shocks:
@@ -615,7 +648,7 @@ if __name__ == '__main__':
             Population = Params.pop_sim_agg_point
         else:
             Population = Params.pop_sim_ind_point
-    
+
     # Make AgentTypes for estimation
     if do_lifecycle:
         DropoutType = CstwMPCAgent(**Params.init_dropout)
@@ -643,11 +676,11 @@ if __name__ == '__main__':
         EstimationAgentList = []
         for n in range(pref_type_count):
             EstimationAgentList.append(deepcopy(PerpetualYouthType))
-    
+
     # Give all the AgentTypes different seeds
     for j in range(len(EstimationAgentList)):
         EstimationAgentList[j].seed = j
-    
+
     # Make an economy for the consumers to live in
     market_dict = copy(Params.init_market)
     market_dict['AggShockBool'] = do_agg_shocks
@@ -658,25 +691,25 @@ if __name__ == '__main__':
     EstimationEconomy.LorenzTarget = lorenz_target
     EstimationEconomy.LorenzData = lorenz_long_data
     if do_lifecycle:
-        EstimationEconomy.PopGroFac = Params.PopGroFac
-        EstimationEconomy.TypeWeight = Params.TypeWeight_lifecycle
-        EstimationEconomy.T_retire = Params.working_T-1
-        EstimationEconomy.act_T = Params.T_sim_LC
-        EstimationEconomy.ignore_periods = Params.ignore_periods_LC
+        EstimationEconomy.assign_parameters(PopGroFac = Params.PopGroFac)
+        EstimationEconomy.assign_parameters(TypeWeight = Params.TypeWeight_lifecycle)
+        EstimationEconomy.assign_parameters(T_retire = Params.working_T-1)
+        EstimationEconomy.assign_parameters(act_T = Params.T_sim_LC)
+        EstimationEconomy.assign_parameters(ignore_periods = Params.ignore_periods_LC)
     else:
-        EstimationEconomy.PopGroFac = 1.0
-        EstimationEconomy.TypeWeight = [1.0]
-        EstimationEconomy.act_T = Params.T_sim_PY
-        EstimationEconomy.ignore_periods = Params.ignore_periods_PY
+        EstimationEconomy.assign_parameters(PopGroFac = 1.0)
+        EstimationEconomy.assign_parameters(TypeWeight = [1.0])
+        EstimationEconomy.assign_parameters(act_T = Params.T_sim_PY)
+        EstimationEconomy.assign_parameters(ignore_periods = Params.ignore_periods_PY)
     if do_agg_shocks:
         EstimationEconomy(**Params.aggregate_params)
         EstimationEconomy.update()
         EstimationEconomy.makeAggShkHist()
-    
+
     # Estimate the model as requested
     if run_estimation:
         print('Beginning an estimation with the specification name ' + spec_name + '...')
-        
+
         # Choose the bounding region for the parameter search
         if param_name == 'CRRA':
             param_range = [0.2,70.0]
@@ -686,7 +719,7 @@ if __name__ == '__main__':
             spread_range = [0.006,0.008]
         else:
             print('Parameter range for ' + param_name + ' has not been defined!')
-    
+
         if do_param_dist:
             # Run the param-dist estimation
             paramDistObjective = lambda spread : find_lorenz_distance_at_target_KY(
@@ -702,23 +735,25 @@ if __name__ == '__main__':
             t_end = time()
         else:
             # Run the param-point estimation only
-            paramPointObjective = lambda center : get_KY_ratio_difference(economy = EstimationEconomy,
-                                                 param_name = param_name,
-                                                 param_count = pref_type_count,
-                                                 center = center,
-                                                 spread = 0.0,
-                                                 dist_type = dist_type)
+            paramPointObjective = lambda center : get_KY_ratio_difference(
+                economy = EstimationEconomy,
+                param_name = param_name,
+                param_count = pref_type_count,
+                center = center,
+                spread = 0.0,
+                dist_type = dist_type
+            )
             t_start = time()
             center_estimate = brentq(paramPointObjective,param_range[0],param_range[1],xtol=1e-6)
             spread_estimate = 0.0
             t_end = time()
-    
+
         # Display statistics about the estimated model
-        #center_estimate = 0.986609223266
-        #spread_estimate = 0.00853886395698
-        EstimationEconomy.LorenzBool = True
-        EstimationEconomy.ManyStatsBool = True
-        EstimationEconomy.distribute_params(param_name, pref_type_count,center_estimate,spread_estimate, dist_type)
+        EstimationEconomy.assign_parameters(LorenzBool = True)
+        EstimationEconomy.assign_parameters(ManyStatsBool = True)
+        EstimationEconomy.distribute_params(
+            param_name, pref_type_count,center_estimate,spread_estimate, dist_type
+        )
         EstimationEconomy.solve()
         EstimationEconomy.calc_lorenz_distance()
         print('Estimate is center=' + str(center_estimate) + ', spread=' + str(spread_estimate) + ', took ' + str(t_end-t_start) + ' seconds.')

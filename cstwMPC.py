@@ -238,9 +238,9 @@ do_param_dist = True          # Do param-dist version if True, param-point if Fa
 do_lifecycle = False          # Use lifecycle model if True, perpetual youth if False
 do_agg_shocks = False         # Solve the FBS aggregate shocks version of the model
 do_liquid = True              # Matches liquid assets data when True, net worth data when False
-do_tractable = True           # 
+do_tractable = False          # 
 os.chdir(path_to_models)
-exec(open('cstwMPC_MAIN.py').read())
+#exec(open('cstwMPC_MAIN.py').read())
 
 # %%
 # Plot 
