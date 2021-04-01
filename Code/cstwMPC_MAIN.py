@@ -433,10 +433,6 @@ class CstwMPCMarket(EstimationMarketClass):
         LorenzSim = np.mean(np.array(self.history['Lorenz'])[self.ignore_periods:],axis=0)
         dist = np.sqrt(np.sum((100*(LorenzSim - self.LorenzTarget))**2))
         self.LorenzDistance = dist
-
-        if np.isnan(dist):
-            breakpoint()
-
         return dist
 
     def show_many_stats(self,spec_name=None):
