@@ -1,8 +1,8 @@
-matplotlib
-numpy
-scipy
-dill
-joblib
-future
-econ-ark
+matplotlib==3.3.2
+numpy==1.19.4
+scipy==1.5.4
+dill==0.3.3
+joblib==0.17.0
+future==0.18.2
+econ-ark==0.11.0
 
