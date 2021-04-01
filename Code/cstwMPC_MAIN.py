@@ -124,7 +124,20 @@ class CstwMPCMarket(EstimationMarketClass):
     reap_vars = ['aLvl','pLvl','MPCnow','TranShk','EmpNow','t_age']
     sow_vars  = [] # Nothing needs to be sent back to agents in the idiosyncratic shocks version
     const_vars = [] # ['LorenzBool','ManyStatsBool']
-    track_vars = ['MaggNow','AaggNow','KtoYnow','Lorenz','LorenzLong','MPCall','MPCretired','MPCemployed','MPCunemployed','MPCbyIncome','MPCbyWealthRatio','HandToMouthPct']
+    track_vars = [
+        'MaggNow',
+        'AaggNow',
+        'KtoYnow',
+        'Lorenz',
+        'LorenzLong',
+        'MPCall',
+        'MPCretired',
+        'MPCemployed',
+        'MPCunemployed',
+        'MPCbyIncome',
+        'MPCbyWealthRatio',
+        'HandToMouthPct'
+        ]
     dyn_vars = [] # No dynamics in the idiosyncratic shocks version
 
     def __init__(self,**kwds):
