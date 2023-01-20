@@ -461,7 +461,7 @@ class CstwMPCMarket(EstimationMarketClass):
                 exec(
                     "self.agents[j].assign_parameters("
                     + param_name
-                    + "= param_dist.atoms[b])"
+                    + "= param_dist.atoms[b][0])"
                 )
                 j += 1
             b += 1
