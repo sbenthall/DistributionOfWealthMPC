@@ -431,7 +431,7 @@ class CstwMPCMarket(EstimationMarketClass):
         # Get a list of discrete values for the parameter
         if dist_type == "uniform":
             # If uniform, center is middle of distribution, spread is distance to either edge
-            param_dist = Uniform(bot=center - spread, top=center + spread).approx(
+            param_dist = Uniform(bot=center - spread, top=center + spread).discretize(
                 N=param_count
             )
         elif dist_type == "lognormal":
@@ -443,7 +443,7 @@ class CstwMPCMarket(EstimationMarketClass):
                 tail_N=tail_N,
                 tail_bound=[0.0, 0.9],
                 tail_order=np.e,
-            ).approx(N=param_count - tail_N)
+            ).discretize(N=param_count - tail_N)
 
         # Distribute the parameters to the various types, assigning consecutive types the same
         # value if there are more types than values
