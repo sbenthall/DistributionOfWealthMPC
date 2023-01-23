@@ -112,8 +112,8 @@ warnings.filterwarnings("ignore")
 # %% [markdown]
 # The idiosyncratic (household) income process is logarithmic Friedman:
 # \begin{eqnarray*}
-# \yLev_{t+1}&=&\pRat_{t+1}\tshk_{t+1}\Wage\\
-# \pRat_{t+1}&=&\pRat_{t}\pshk_{t+1}
+# \yLev*{t+1}&=&\pRat*{t+1}\tshk*{t+1}\Wage\\
+# \pRat*{t+1}&=&\pRat*{t}\pshk*{t+1}
 # \end{eqnarray*}
 #
 
