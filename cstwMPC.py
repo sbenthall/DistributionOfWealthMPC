@@ -23,7 +23,7 @@
 #
 
 # %% code_folding=[]
-# This cell does some standard python setup
+# This cell does some standard python setup!
 
 # Tools for navigating the filesystem
 import warnings
@@ -112,8 +112,8 @@ warnings.filterwarnings("ignore")
 # %% [markdown]
 # The idiosyncratic (household) income process is logarithmic Friedman:
 # \begin{eqnarray*}
-# \yLev*{t+1}&=&\pRat*{t+1}\tshk*{t+1}\Wage\\
-# \pRat*{t+1}&=&\pRat*{t}\pshk*{t+1}
+# \yLev_{t+1}&=&\pRat_{t+1}\tshk_{t+1}\Wage\\
+# \pRat_{t+1}&=&\pRat_{t}\pshk_{t+1}
 # \end{eqnarray*}
 #
 
@@ -121,16 +121,16 @@ warnings.filterwarnings("ignore")
 # The Bellman form of the value function for households is:
 #
 # \begin{eqnarray*}
-# \valfn(\mRat*{t})&=&\underset{\cFunc*{t}}{\max } ~~ \uFunc(\cFunc*{t}(\mRat*t))+\Discount \PLives \Ex\*{t}\left[ \pshk*{t+1}^{1-\CRRA}\valfn(\mRat\_{t+1})
+# \valfn(\mRat_{t})&=&\underset{\cFunc_{t}}{\max } ~~ \uFunc(\cFunc_{t}(\mRat_t))+\Discount \PLives \Ex_{t}\left[ \pshk_{t+1}^{1-\CRRA}\valfn(\mRat_{t+1})
 # \right] \\
 # \notag &\text{s.t.}&\\
-# \wEndRat*{t} &=&\mRat*{t}-\cRat*{t},\\
-# \wEndRat*{t} &\geq &0, \\
-# \kRat*{t+1} &=&\wEndRat*{t}/(\PLives \pshk*{t+1}),
+# \wEndRat_{t} &=&\mRat_{t}-\cRat_{t},\\
+# \wEndRat_{t} &\geq &0, \\
+# \kRat_{t+1} &=&\wEndRat_{t}/(\PLives \pshk_{t+1}),
 # \\
-# \mRat*{t+1} &=&(\daleth +\rProd*t)\kRat*{t+1}+\tshk\_{t+1},\\
+# \mRat_{t+1} &=&(\daleth +\rProd_t)\kRat_{t+1}+\tshk_{t+1},\\
 # \rProd &=&\kapShare\ptyLev(\KLev/\labor\LLev)^{\kapShare-1}\\
-# \end{eqnarray\*}
+# \end{eqnarray*}
 #
 
 # %%
