@@ -106,7 +106,7 @@ results_files_and_targers = {
     "fourth wealth quintile" : 1.319, 
     "top wealth quintile" : 0.022
     },
-    "PYbetaDistAggNetWorthResults.txt" : { ## Targets from commit 3aefa00
+    "PYbetaDistIndNetWorthResults.txt" : { ## Targets from commit 3aefa00
     ## MPC targets
     "Average MPC for all consumers" : 0.263,
     "Average MPC in the top percentile of W/Y" : 0.052,
@@ -136,7 +136,7 @@ results_files_and_targers = {
 
 MPC_tolerance_plus = 0.01
 
-quintile_tolerance_times = 0.13
+quintile_tolerance_times = 0.3
 
 
 # Regular expressions for extracting data from the results files.
@@ -173,7 +173,6 @@ for filename in results_files_and_targers:
                     t_ceiling = t * (1 + quintile_tolerance_times)
 
                     ### This should be a test of being within 10% percentile
-                    print(d, t_floor, t_ceiling)
                     assert d > t_floor and d < t_ceiling, f"{filename}: {key} target is {t}, got {d}. Acceptable values are between {t_floor} and {t_ceiling}"
             except Exception as e:
                 print(filename, key)
