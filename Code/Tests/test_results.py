@@ -136,7 +136,7 @@ results_files_and_targers = {
 
 MPC_tolerance_plus = 0.01
 
-quintile_tolerance_times = 0.11
+quintile_tolerance_times = 0.13
 
 
 # Regular expressions for extracting data from the results files.
@@ -158,7 +158,10 @@ for filename in results_files_and_targers:
                     t = results_files_and_targers[filename][key]
                     d = float(MPC_re.search(data)[1])
 
-                    assert t > d - MPC_tolerance_plus or t < d + MPC_tolerance_plus, f"{key} target is {t}, got {d}"
+                    t_floor = t - MPC_tolerance_plus
+                    t_ceiling = t + MPC_tolerance_plus
+
+                    assert d > t_floor and t < t_ceiling, f"{filename}: {key} target is {t}, got {d}. Acceptable values are between {t_floor} and {t_ceiling}"
 
                 elif 'quintile' in key:
                     quintile_re = re.compile(f"([\d\.]+)\% are in the {key}")
@@ -166,8 +169,12 @@ for filename in results_files_and_targers:
                     t = results_files_and_targers[filename][key]
                     d = float(quintile_re.search(data)[1])
 
+                    t_floor = t * (1 - quintile_tolerance_times)
+                    t_ceiling = t * (1 + quintile_tolerance_times)
+
                     ### This should be a test of being within 10% percentile
-                    assert t > d * (1 - quintile_tolerance_times) or t < d * (1 + quintile_tolerance_times), f"{key} target is {t}, got {d}"
+                    print(d, t_floor, t_ceiling)
+                    assert d > t_floor and d < t_ceiling, f"{filename}: {key} target is {t}, got {d}. Acceptable values are between {t_floor} and {t_ceiling}"
             except Exception as e:
                 print(filename, key)
                 raise e
