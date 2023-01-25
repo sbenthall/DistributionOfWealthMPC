@@ -25,6 +25,13 @@ Running do_custom.py will let you choose exactly which model to estimate
 
 Progress will be printed to screen when these files are run.
 
+## Releases
+
+Releases of this repository represent archival versions of the repository.
+They are guaranteed to work and to reproduce the paper results up to a level of tolerance (see 'Testing changes' below).
+
+The `master` branch is a "development branch" with some unpinned dependencies.
+
 ## Testing changes
 
 This REMARK is versioned. It will be updated with new releases of HARK.
