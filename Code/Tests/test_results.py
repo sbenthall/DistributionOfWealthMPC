@@ -136,7 +136,8 @@ results_files_and_targers = {
 
 MPC_tolerance_plus = 0.01
 
-quintile_tolerance_times = 0.3
+# This is five percentage points
+quintile_tolerance_plus = 7
 
 
 # Regular expressions for extracting data from the results files.
@@ -169,8 +170,8 @@ for filename in results_files_and_targers:
                     t = results_files_and_targers[filename][key]
                     d = float(quintile_re.search(data)[1])
 
-                    t_floor = t * (1 - quintile_tolerance_times)
-                    t_ceiling = t * (1 + quintile_tolerance_times)
+                    t_floor = t - quintile_tolerance_plus
+                    t_ceiling = t + quintile_tolerance_plus
 
                     ### This should be a test of being within 10% percentile
                     assert d > t_floor and d < t_ceiling, f"{filename}: {key} target is {t}, got {d}. Acceptable values are between {t_floor} and {t_ceiling}"
