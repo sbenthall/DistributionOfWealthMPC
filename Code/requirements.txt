@@ -4,5 +4,6 @@ scipy
 dill
 joblib
 future
+ipython
 git+https://github.com/econ-ark/HARK.git@master
 

@@ -24,3 +24,23 @@ Running do_mid.py will estimate the two main specifications reported in the pape
 Running do_custom.py will let you choose exactly which model to estimate
 
 Progress will be printed to screen when these files are run.
+
+## Releases
+
+Releases of this repository represent archival versions of the repository.
+They are guaranteed to work and to reproduce the paper results up to a level of tolerance (see 'Testing changes' below).
+
+The `master` branch is a "development branch" with some unpinned dependencies.
+
+## Testing changes
+
+This REMARK is versioned. It will be updated with new releases of HARK.
+
+To test whether recent changes in the dependencies have significantly changed the substantive results, run the test script after running `do_min.py`:
+
+```
+python Code/Tests/test_results.py
+```
+
+This script compares the results in the output test file with target values.
+It will report any results that are outside of a threshold of tolerance.
