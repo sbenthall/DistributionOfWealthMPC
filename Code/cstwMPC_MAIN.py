@@ -53,13 +53,15 @@ from HARK.ConsumptionSaving.ConsAggShockModel import (
 from scipy.optimize import brentq, minimize_scalar
 import matplotlib.pyplot as plt
 
-from IPython import (
-    get_ipython,
-)  # Needed to test whether being run from command line or interactively
+# Needed to test whether being run from command line or interactively
+from IPython import get_ipython
 
 import SetupParamsCSTW as Params
 
-mystr = lambda number: "{:.3f}".format(number)
+
+def mystr(number):
+    return "{:.3f}".format(number)
+
 
 # Construct the name of the specification from user options
 if param_name == "DiscFac":
@@ -117,9 +119,8 @@ class CstwMPCAgent(EstimationAgentClass):
         )
         self.t_cycle = copy(self.t_age)
         if hasattr(self, "kGrid"):
-            self.aLvlNow = self.kInit * np.ones(
-                self.AgentCount
-            )  # Start simulation near SS
+            # Start simulation near SS
+            self.aLvlNow = self.kInit * np.ones(self.AgentCount)
             self.aNrmNow = self.aLvlNow / self.pLvlNow
 
     def market_action(self):
@@ -134,9 +135,8 @@ class CstwMPCMarket(EstimationMarketClass):
     """
 
     reap_vars = ["aLvl", "pLvl", "MPCnow", "TranShk", "EmpNow", "t_age"]
-    sow_vars = (
-        []
-    )  # Nothing needs to be sent back to agents in the idiosyncratic shocks version
+    # Nothing needs to be sent back to agents in the idiosyncratic shocks version
+    sow_vars = []
     const_vars = []  # ['LorenzBool','ManyStatsBool']
     track_vars = [
         "MaggNow",
@@ -351,9 +351,8 @@ class CstwMPCMarket(EstimationMarketClass):
             self.MPCall = np.sum(MPCannual * CohortWeight) / np.sum(CohortWeight)
             employed = EmpNow
             unemployed = np.logical_not(employed)
-            if (
-                self.T_retire > 0
-            ):  # Adjust for the lifecycle model, where agents might be retired instead
+            # Adjust for the lifecycle model, where agents might be retired instead
+            if self.T_retire > 0:
                 unemployed = np.logical_and(unemployed, age < self.T_retire)
                 employed = np.logical_and(employed, age < self.T_retire)
                 retired = age >= self.T_retire
@@ -384,9 +383,10 @@ class CstwMPCMarket(EstimationMarketClass):
             wealth_quintiles[aLvl > quintile_cuts[1]] = 3
             wealth_quintiles[aLvl > quintile_cuts[2]] = 4
             wealth_quintiles[aLvl > quintile_cuts[3]] = 5
+            # Looking at consumers with MPCs in the top 1/3
             MPC_cutoff = get_percentiles(
                 MPCannual, weights=CohortWeight, percentiles=[2.0 / 3.0]
-            )  # Looking at consumers with MPCs in the top 1/3
+            )
             these = MPCannual > MPC_cutoff
             in_top_third_MPC = wealth_quintiles[these]
             temp_weights = CohortWeight[these]
@@ -565,9 +565,8 @@ class CstwMPCMarket(EstimationMarketClass):
             )
             plt.ioff()
             plt.show(block=False)
-            plt.pause(
-                2
-            )  # Give OS time to make the plot (it only draws when main thread is sleeping)
+            # Give OS time to make the plot (it only draws when main thread is sleeping)
+            plt.pause(2)
 
         # Make a string of results to display
         results_string = (
@@ -705,12 +704,10 @@ def get_KY_ratio_difference(
     diff : float
         Difference between simulated and target capital to income ratio for this economy.
     """
-    economy.assign_parameters(
-        LorenzBool=False, ManyStatsBool=False
-    )  # Make sure we're not wasting time calculating stuff
-    economy.distribute_params(
-        param_name, param_count, center, spread, dist_type
-    )  # Distribute parameters
+    # Make sure we're not wasting time calculating stuff
+    economy.assign_parameters(LorenzBool=False, ManyStatsBool=False)
+    # Distribute parameters
+    economy.distribute_params(param_name, param_count, center, spread, dist_type)
     economy.solve()
     diff = economy.calc_KY_ratio_difference()
     print(
@@ -751,27 +748,30 @@ def find_lorenz_distance_at_target_KY(
     dist : float
         Sum of squared distances between simulated and target Lorenz points for this economy (sqrt).
     """
+
     # Define the function to search for the correct value of center, then find its zero
-    intermediateObjective = lambda center: get_KY_ratio_difference(
-        economy=economy,
-        param_name=param_name,
-        param_count=param_count,
-        center=center,
-        spread=spread,
-        dist_type=dist_type,
-    )
+    def intermediateObjective(center):
+        return get_KY_ratio_difference(
+            economy=economy,
+            param_name=param_name,
+            param_count=param_count,
+            center=center,
+            spread=spread,
+            dist_type=dist_type,
+        )
+
     optimal_center = brentq(
         intermediateObjective, center_range[0], center_range[1], xtol=10 ** (-6)
     )
     economy.center_save = optimal_center
 
     # Get the sum of squared Lorenz distances given the correct distribution of the parameter
-    economy.assign_parameters(
-        LorenzBool=True
-    )  # Make sure we actually calculate simulated Lorenz points
+    # Make sure we actually calculate simulated Lorenz points
+    economy.assign_parameters(LorenzBool=True)
+    # Distribute parameters
     economy.distribute_params(
         param_name, param_count, optimal_center, spread, dist_type
-    )  # Distribute parameters
+    )
     economy.solve_agents()
     economy.make_history()
     dist = economy.calc_lorenz_distance()
@@ -828,7 +828,6 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
 ###############################################################################
 
 if __name__ == "__main__":
-
     # Set targets for K/Y and the Lorenz curve based on the data
     if do_liquid:
         lorenz_target = np.array([0.0, 0.004, 0.025, 0.117])
@@ -940,14 +939,16 @@ if __name__ == "__main__":
 
         if do_param_dist:
             # Run the param-dist estimation
-            paramDistObjective = lambda spread: find_lorenz_distance_at_target_KY(
-                economy=EstimationEconomy,
-                param_name=param_name,
-                param_count=pref_type_count,
-                center_range=param_range,
-                spread=spread,
-                dist_type=dist_type,
-            )
+            def paramDistObjective(spread):
+                return find_lorenz_distance_at_target_KY(
+                    economy=EstimationEconomy,
+                    param_name=param_name,
+                    param_count=pref_type_count,
+                    center_range=param_range,
+                    spread=spread,
+                    dist_type=dist_type,
+                )
+
             t_start = time()
             spread_estimate = (
                 minimize_scalar(
@@ -958,14 +959,16 @@ if __name__ == "__main__":
             t_end = time()
         else:
             # Run the param-point estimation only
-            paramPointObjective = lambda center: get_KY_ratio_difference(
-                economy=EstimationEconomy,
-                param_name=param_name,
-                param_count=pref_type_count,
-                center=center,
-                spread=0.0,
-                dist_type=dist_type,
-            )
+            def paramPointObjective(center):
+                return get_KY_ratio_difference(
+                    economy=EstimationEconomy,
+                    param_name=param_name,
+                    param_count=pref_type_count,
+                    center=center,
+                    spread=0.0,
+                    dist_type=dist_type,
+                )
+
             t_start = time()
             center_estimate = brentq(
                 paramPointObjective, param_range[0], param_range[1], xtol=1e-6
