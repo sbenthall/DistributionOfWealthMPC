@@ -102,7 +102,7 @@ class CstwMPCAgent(EstimationAgentClass):
         self.t_age = DiscreteDistribution(
             self.AgeDstn,
             np.arange(self.AgeDstn.size),
-            seed = self.RNG.randint(0,2**31-1)
+            seed = self.RNG.integers(0,2**31-1)
         ).draw(
             self.AgentCount,
             exact_match=False
@@ -378,22 +378,23 @@ class CstwMPCMarket(EstimationMarketClass):
         # Get a list of discrete values for the parameter
         if dist_type == 'uniform':
             # If uniform, center is middle of distribution, spread is distance to either edge
-            param_dist = Uniform(bot=center-spread,top=center+spread).approx(N=param_count)
+            param_dist = Uniform(bot=center-spread,top=center+spread).discretize(N=param_count)
         elif dist_type == 'lognormal':
             # If lognormal, center is the mean and spread is the standard deviation (in log)
             tail_N = 3
-            param_dist = Lognormal(mu=np.log(center)-0.5*spread**2,sigma=spread,tail_N=tail_N,tail_bound=[0.0,0.9], tail_order=np.e).approx(N=param_count-tail_N)
+            param_dist = Lognormal(mu=np.log(center)-0.5*spread**2,sigma=spread,tail_N=tail_N,tail_bound=[0.0,0.9], tail_order=np.e).discretize(N=param_count-tail_N)
 
         # Distribute the parameters to the various types, assigning consecutive types the same
         # value if there are more types than values
         replication_factor = len(self.agents) // param_count 
-            # Note: the double division is intenger division in Python 3 and 2.7, this makes it explicit
+            # Note: the double division is integer division in Python 3, this makes it explicit
         j = 0
         b = 0
         while j < len(self.agents):
             for n in range(replication_factor):
-                self.agents[j].assign_parameters(AgentCount = int(self.Population*param_dist.pmf[b]*self.TypeWeight[n]))
-                exec('self.agents[j].assign_parameters(' + param_name + '= param_dist.X[b])')
+                self.agents[j].assign_parameters(AgentCount = int(self.Population*param_dist.pmv[b]*self.TypeWeight[n]))
+                print(param_dist.atoms[0,b])
+                self.agents[j].assign_parameters(**{param_name : param_dist.atoms[0,b]})
                 j += 1
             b += 1
 
