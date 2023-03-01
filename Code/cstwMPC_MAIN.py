@@ -57,6 +57,7 @@ mystr = lambda number : "{:.3f}".format(number)
 
 def process_options(options):
 
+
     # Construct the name of the specification from user options
     if options['param_name'] == 'DiscFac':
         param_text = 'beta'
@@ -100,6 +101,7 @@ def process_options(options):
         EstimationMarketClass = DoWMarket
 
     return param_text, life_text, model_text, wealth_text, shock_text, spec_name, pref_type_count, EstimationAgentClass, EstimationMarketClass
+
 
 
 def get_KY_ratio_difference(economy,param_name,param_count,center,spread,dist_type):
