@@ -5,23 +5,22 @@ Will run both beta-point and beta-dist versions.
 '''
 import os
 
-here = os.path.dirname(os.path.realpath(__file__))
-my_path = os.path.join(here,'')
-path_to_models = os.path.join(my_path,'Code')
-path_to_options = os.path.join(path_to_models,'Options')
 
-# Set up basic options
-os.chdir(path_to_options)
-exec(open('UseUniformBetaDist.py').read())
-exec(open('DoStandardWork.py').read())
+from Code.Options.all_options import all_options
+import Code.SetupParamsCSTW as Params
+from Code.cstwMPC_MAIN import main # TODO better name for this
 
-# Run beta-point model
-exec(open('SimpleSpecPoint.py').read())
-os.chdir(path_to_models)
-exec(open('cstwMPC_MAIN.py').read())
+basic_options = all_options['UseUniformBetaDist'].copy()
+basic_options.update(all_options['DoStandardWork'])
 
-# Run beta-dist model
-os.chdir(path_to_options)
-exec(open('SimpleSpecDist.py').read())
-os.chdir(path_to_models)
-exec(open('cstwMPC_MAIN.py').read())
+
+options = basic_options.copy()
+options.update(all_options['SimpleSpecPoint'])
+
+main(options, Params)
+
+options = basic_options.copy()
+
+options.update(all_options['SimpleSpecDist'])
+
+main(options, Params)
