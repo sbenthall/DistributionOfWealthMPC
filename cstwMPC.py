@@ -7,7 +7,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.14.4
+#       jupytext_version: 1.14.5
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -26,18 +26,16 @@
 # This cell does some standard python setup!
 
 # Tools for navigating the filesystem
-import warnings
-from IPython import get_ipython  # In case it was run from python instead of ipython
-from matplotlib.pyplot import plot, draw, show
-import matplotlib.pyplot as plt
-import matplotlib
-from copy import copy, deepcopy
-import sys
 import os
+import warnings
+
+import matplotlib.pyplot as plt
 
 # Import related generic python packages
 import numpy as np
-from time import time
+
+import Code.SetupParamsCSTW as Params
+from Code.cstwMPC_MAIN import main
 
 
 def mystr(number):
@@ -112,8 +110,8 @@ warnings.filterwarnings("ignore")
 # %% [markdown]
 # The idiosyncratic (household) income process is logarithmic Friedman:
 # \begin{eqnarray*}
-# \yLev_{t+1}&=&\pRat_{t+1}\tshk_{t+1}\Wage\\
-# \pRat_{t+1}&=&\pRat_{t}\pshk_{t+1}
+# \yLev*{t+1}&=&\pRat*{t+1}\tshk*{t+1}\Wage\\
+# \pRat*{t+1}&=&\pRat*{t}\pshk*{t+1}
 # \end{eqnarray*}
 #
 
@@ -121,14 +119,14 @@ warnings.filterwarnings("ignore")
 # The Bellman form of the value function for households is:
 #
 # \begin{eqnarray*}
-# \valfn(\mRat_{t})&=&\underset{\cFunc_{t}}{\max } ~~ \uFunc(\cFunc_{t}(\mRat_t))+\Discount \PLives \Ex_{t}\left[ \pshk_{t+1}^{1-\CRRA}\valfn(\mRat_{t+1})
+# \valfn(\mRat*{t})&=&\underset{\cFunc*{t}}{\max } ~~ \uFunc(\cFunc*{t}(\mRat_t))+\Discount \PLives \Ex*{t}\left[ \pshk_{t+1}^{1-\CRRA}\valfn(\mRat_{t+1})
 # \right] \\
 # \notag &\text{s.t.}&\\
-# \wEndRat_{t} &=&\mRat_{t}-\cRat_{t},\\
-# \wEndRat_{t} &\geq &0, \\
-# \kRat_{t+1} &=&\wEndRat_{t}/(\PLives \pshk_{t+1}),
+# \wEndRat*{t} &=&\mRat*{t}-\cRat*{t},\\
+# \wEndRat*{t} &\geq &0, \\
+# \kRat*{t+1} &=&\wEndRat*{t}/(\PLives \pshk*{t+1}),
 # \\
-# \mRat_{t+1} &=&(\daleth +\rProd_t)\kRat_{t+1}+\tshk_{t+1},\\
+# \mRat*{t+1} &=&(\daleth +\rProd*t)\kRat*{t+1}+\tshk\_{t+1},\\
 # \rProd &=&\kapShare\ptyLev(\KLev/\labor\LLev)^{\kapShare-1}\\
 # \end{eqnarray*}
 #
@@ -139,7 +137,6 @@ This will run the absolute minimum amount of work that actually produces
 relevant output-- no aggregate shocks, perpetual youth, matching net worth.
 Will run both beta-point and beta-dist versions.
 """
-import os
 
 """
 Copied here from do_min.py.
@@ -150,6 +147,7 @@ or import it, or execute it as is here, TBD.
 here = os.path.dirname(os.path.realpath("cstwMPC.ipynb"))
 my_path = os.path.join(here, "")
 path_to_models = os.path.join(my_path, "Code")
+
 
 # %%
 # For speed here, use the "tractable" version of the model
@@ -179,23 +177,36 @@ do_tractable = True
 This options file establishes the second simplest model specification possible:
 with heterogeneity, no aggregate shocks, perpetual youth model, matching net worth.
 """
+
 do_param_dist = False  # Do param-dist version if True, param-point if False
 do_lifecycle = False  # Use lifecycle model if True, perpetual youth if False
 do_agg_shocks = False  # Solve the FBS aggregate shocks version of the model
 # Matches liquid assets data when True, net worth data when False
 do_liquid = False
 
+options = {
+    "param_name": param_name,
+    "dist_type": dist_type,
+    "run_estimation": run_estimation,
+    "run_sensitivity": run_sensitivity,
+    "find_beta_vs_KY": find_beta_vs_KY,
+    "do_tractable": do_tractable,
+    "do_param_dist": do_param_dist,
+    "do_lifecycle": do_lifecycle,
+    "do_agg_shocks": do_agg_shocks,
+    "do_liquid": do_liquid,
+}
 
-os.chdir(path_to_models)
-exec(open("cstwMPC_MAIN.py").read())
+
+EstimationEconomy = main(options, Params)
 
 # %%
 # Get some tools for plotting simulated vs actual wealth distributions
-from HARK.utilities import get_lorenz_shares, get_percentiles
+from HARK.utilities import get_lorenz_shares
 
 # The cstwMPC model conveniently has data on the wealth distribution
 # from the U.S. Survey of Consumer Finances
-from SetupParamsCSTW import SCF_wealth, SCF_weights
+from Code.SetupParamsCSTW import SCF_wealth, SCF_weights
 
 # Construct the Lorenz curves and plot them
 
@@ -218,6 +229,7 @@ plt.ylabel("Cumulative share of wealth")
 plt.legend(loc=2)
 plt.ylim([0, 1])
 plt.show("wealth_distribution_1")
+
 
 # %% [markdown]
 # ## Time Preference Heterogeneneity
@@ -263,6 +275,7 @@ do_tractable = False  #
 os.chdir(path_to_models)
 # exec(open('cstwMPC_MAIN.py').read())
 
+
 # %%
 # Plot
 plt.figure(figsize=(5, 5))
@@ -275,5 +288,6 @@ plt.ylabel("Cumulative share of wealth")
 plt.legend(loc=2)
 plt.ylim([0, 1])
 plt.show("wealth_distribution_2")
+
 
 # %%
