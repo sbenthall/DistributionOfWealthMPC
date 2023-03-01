@@ -108,7 +108,7 @@ def process_options(options):
 
 
 def get_KY_ratio_difference(
-    economy, param_name, param_count, center, spread, dist_type
+    center, economy, param_name, param_count, spread, dist_type
 ):
     """
     Finds the difference between simulated and target capital to income ratio in an economy when
@@ -151,7 +151,7 @@ def get_KY_ratio_difference(
 
 
 def find_lorenz_distance_at_target_KY(
-    economy, param_name, param_count, center_range, spread, dist_type
+    spread, economy, param_name, param_count, center_range, dist_type
 ):
     """
     Finds the sum of squared distances between simulated and target Lorenz points in an economy when
@@ -180,18 +180,13 @@ def find_lorenz_distance_at_target_KY(
         Sum of squared distances between simulated and target Lorenz points for this economy (sqrt).
     """
     # Define the function to search for the correct value of center, then find its zero
-    def intermediateObjective(center):
-        return get_KY_ratio_difference(
-            economy=economy,
-            param_name=param_name,
-            param_count=param_count,
-            center=center,
-            spread=spread,
-            dist_type=dist_type,
-        )
 
     optimal_center = brentq(
-        intermediateObjective, center_range[0], center_range[1], xtol=10 ** (-6)
+        get_KY_ratio_difference,
+        center_range[0],
+        center_range[1],
+        args=(economy, param_name, param_count, spread, dist_type),
+        xtol=10 ** (-6),
     )
     economy.center_save = optimal_center
 
@@ -397,39 +392,41 @@ def main(options, Params):
 
         if options["do_param_dist"]:
             # Run the param-dist estimation
-            def paramDistObjective(spread):
-                return find_lorenz_distance_at_target_KY(
-                    economy=EstimationEconomy,
-                    param_name=options["param_name"],
-                    param_count=pref_type_count,
-                    center_range=param_range,
-                    spread=spread,
-                    dist_type=options["dist_type"],
-                )
 
             t_start = time()
             spread_estimate = (
                 minimize_scalar(
-                    paramDistObjective, bracket=spread_range, tol=1e-4, method="brent"
+                    find_lorenz_distance_at_target_KY,
+                    bracket=spread_range,
+                    args=(
+                        EstimationEconomy,
+                        options["param_name"],
+                        pref_type_count,
+                        param_range,
+                        options["dist_type"],
+                    ),
+                    tol=1e-4,
+                    method="brent",
                 )
             ).x
             center_estimate = EstimationEconomy.center_save
             t_end = time()
         else:
             # Run the param-point estimation only
-            def paramPointObjective(center):
-                return get_KY_ratio_difference(
-                    economy=EstimationEconomy,
-                    param_name=options["param_name"],
-                    param_count=pref_type_count,
-                    center=center,
-                    spread=0.0,
-                    dist_type=options["dist_type"],
-                )
 
             t_start = time()
             center_estimate = brentq(
-                paramPointObjective, param_range[0], param_range[1], xtol=1e-6
+                get_KY_ratio_difference,
+                param_range[0],
+                param_range[1],
+                args=(
+                    EstimationEconomy,
+                    options["param_name"],
+                    pref_type_count,
+                    0.0,
+                    options["dist_type"],
+                ),
+                xtol=1e-6,
             )
             spread_estimate = 0.0
             t_end = time()
