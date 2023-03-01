@@ -25,30 +25,24 @@
 # %% code_folding=[]
 # This cell does some standard python setup!
 
-# Tools for navigating the filesystem
-import os
-import warnings
-
-import matplotlib.pyplot as plt
+import os  # Tools for navigating the filesystem
+import warnings  # The warnings package allows us to ignore some harmless but alarming warning messages
 
 # Import related generic python packages
+import matplotlib.pyplot as plt  # Plotting tools
 import numpy as np
+from HARK.utilities import get_lorenz_shares
 
 import Code.SetupParamsCSTW as Params
 from Code.cstwMPC_MAIN import main
+from Code.SetupParamsCSTW import SCF_wealth, SCF_weights
+
+warnings.filterwarnings("ignore")
 
 
 def mystr(number):
     return "{:.4f}".format(number)
 
-
-# Plotting tools
-
-# iPython gives us some interactive and graphical tools
-
-
-# The warnings package allows us to ignore some harmless but alarming warning messages
-warnings.filterwarnings("ignore")
 
 # %% [markdown]
 # ## Abstract
@@ -119,7 +113,7 @@ warnings.filterwarnings("ignore")
 # The Bellman form of the value function for households is:
 #
 # \begin{eqnarray*}
-# \valfn(\mRat*{t})&=&\underset{\cFunc*{t}}{\max } ~~ \uFunc(\cFunc*{t}(\mRat_t))+\Discount \PLives \Ex*{t}\left[ \pshk_{t+1}^{1-\CRRA}\valfn(\mRat_{t+1})
+# \valfn(\mRat*{t})&=&\underset{\cFunc*{t}}{\max } ~~ \uFunc(\cFunc*{t}(\mRat*t))+\Discount \PLives \Ex\*{t}\left[ \pshk*{t+1}^{1-\CRRA}\valfn(\mRat\_{t+1})
 # \right] \\
 # \notag &\text{s.t.}&\\
 # \wEndRat*{t} &=&\mRat*{t}-\cRat*{t},\\
@@ -128,7 +122,7 @@ warnings.filterwarnings("ignore")
 # \\
 # \mRat*{t+1} &=&(\daleth +\rProd*t)\kRat*{t+1}+\tshk\_{t+1},\\
 # \rProd &=&\kapShare\ptyLev(\KLev/\labor\LLev)^{\kapShare-1}\\
-# \end{eqnarray*}
+# \end{eqnarray\*}
 #
 
 # %%
@@ -170,8 +164,6 @@ find_beta_vs_KY = False
 # Uses a "tractable consumer" rather than solving full model when True
 do_tractable = True
 
-
-# %%
 # Solve for the $\beta-Point$ (do_param_dist=False) for speed
 """
 This options file establishes the second simplest model specification possible:
@@ -184,6 +176,8 @@ do_agg_shocks = False  # Solve the FBS aggregate shocks version of the model
 # Matches liquid assets data when True, net worth data when False
 do_liquid = False
 
+
+# %%
 options = {
     "param_name": param_name,
     "dist_type": dist_type,
@@ -200,14 +194,8 @@ options = {
 
 EstimationEconomy = main(options, Params)
 
+
 # %%
-# Get some tools for plotting simulated vs actual wealth distributions
-from HARK.utilities import get_lorenz_shares
-
-# The cstwMPC model conveniently has data on the wealth distribution
-# from the U.S. Survey of Consumer Finances
-from Code.SetupParamsCSTW import SCF_wealth, SCF_weights
-
 # Construct the Lorenz curves and plot them
 
 pctiles = np.linspace(0.001, 0.999, 15)
@@ -273,8 +261,35 @@ do_agg_shocks = False  # Solve the FBS aggregate shocks version of the model
 do_liquid = True
 do_tractable = False  #
 os.chdir(path_to_models)
-# exec(open('cstwMPC_MAIN.py').read())
 
+
+# %%
+options = {
+    "param_name": param_name,
+    "dist_type": dist_type,
+    "run_estimation": run_estimation,
+    "run_sensitivity": run_sensitivity,
+    "find_beta_vs_KY": find_beta_vs_KY,
+    "do_tractable": do_tractable,
+    "do_param_dist": do_param_dist,
+    "do_lifecycle": do_lifecycle,
+    "do_agg_shocks": do_agg_shocks,
+    "do_liquid": do_liquid,
+}
+
+
+EstimationEconomy = main(options, Params)
+
+# %%
+# Construct the Lorenz curves and plot them
+
+pctiles = np.linspace(0.001, 0.999, 15)
+SCF_Lorenz_points = get_lorenz_shares(
+    SCF_wealth, weights=SCF_weights, percentiles=pctiles
+)
+
+sim_wealth = EstimationEconomy.reap_state["aLvl"][0]
+sim_Lorenz_points = get_lorenz_shares(sim_wealth, percentiles=pctiles)
 
 # %%
 # Plot

@@ -274,6 +274,17 @@ def main(options, Params):
     # Set targets for K/Y and the Lorenz curve based on the data
     if options["do_liquid"]:
         lorenz_target = np.array([0.0, 0.004, 0.025, 0.117])
+        lorenz_long_data = np.hstack(
+            (
+                np.array(0.0),
+                get_lorenz_shares(
+                    Params.SCF_wealth,
+                    weights=Params.SCF_weights,
+                    percentiles=np.arange(0.01, 1.0, 0.01).tolist(),
+                ),
+                np.array(1.0),
+            )
+        )
         KY_target = 6.60
     else:  # This is hacky until I can find the liquid wealth data and import it
         lorenz_target = get_lorenz_shares(
