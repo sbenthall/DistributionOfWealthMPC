@@ -51,7 +51,6 @@ def mystr(number):
 
 
 def process_options(options):
-
     # Construct the name of the specification from user options
     if options["param_name"] == "DiscFac":
         param_text = "beta"
@@ -95,11 +94,6 @@ def process_options(options):
         EstimationMarketClass = DoWMarket
 
     return (
-        param_text,
-        life_text,
-        model_text,
-        wealth_text,
-        shock_text,
         spec_name,
         pref_type_count,
         EstimationAgentClass,
@@ -253,13 +247,7 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
 
 
 def main(options, Params):
-
     (
-        param_text,
-        life_text,
-        model_text,
-        wealth_text,
-        shock_text,
         spec_name,
         pref_type_count,
         EstimationAgentClass,
