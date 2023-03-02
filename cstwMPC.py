@@ -34,7 +34,7 @@ import numpy as np
 from HARK.utilities import get_lorenz_shares
 
 import Code.SetupParamsCSTW as Params
-from Code.cstwMPC_MAIN import main
+from Code.cstwMPC_MAIN import estimate
 from Code.SetupParamsCSTW import SCF_wealth, SCF_weights
 
 warnings.filterwarnings("ignore")
@@ -192,7 +192,7 @@ options = {
 }
 
 
-EstimationEconomy = main(options, Params)
+EstimationEconomy = estimate(options, Params)
 
 
 # %%
@@ -278,7 +278,7 @@ options = {
 }
 
 
-EstimationEconomy = main(options, Params)
+EstimationEconomy = estimate(options, Params)
 
 # %%
 # Construct the Lorenz curves and plot them

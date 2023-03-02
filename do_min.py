@@ -6,7 +6,7 @@ Will run both beta-point and beta-dist versions.
 
 
 import Code.SetupParamsCSTW as Params
-from Code.cstwMPC_MAIN import main  # TODO better name for this
+from Code.cstwMPC_MAIN import estimate  # TODO better name for this
 from Code.Options.all_options import all_options
 
 basic_options = all_options["UseUniformBetaDist"].copy()
@@ -16,10 +16,10 @@ basic_options.update(all_options["DoStandardWork"])
 options = basic_options.copy()
 options.update(all_options["SimpleSpecPoint"])
 
-main(options, Params)
+estimate(options, Params)
 
 options = basic_options.copy()
 
 options.update(all_options["SimpleSpecDist"])
 
-main(options, Params)
+estimate(options, Params)
