@@ -171,6 +171,9 @@ def find_lorenz_distance_at_target_KY(
     """
     # Define the function to search for the correct value of center, then find its zero
 
+    # remove brentq and use minimize_scalar(method="brentq") instead
+    # root finding
+    # use more sophisticaed discrete distribution with zero mass point at ends of support
     optimal_center = brentq(
         get_KY_ratio_difference,
         center_range[0],
@@ -212,7 +215,7 @@ def get_KY_and_find_lorenz_distance(
 
     economy.center_save = center
 
-    return dist + np.abs(diff)
+    return dist + diff**2
 
 
 def calc_stationary_age_dstn(LivPrb, terminal_period):
