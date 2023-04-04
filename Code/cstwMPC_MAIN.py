@@ -36,11 +36,10 @@ from __future__ import absolute_import, division, print_function
 from builtins import range, str
 from copy import copy, deepcopy
 from time import time
-import estimagic as em
 
 import numpy as np
 from HARK.utilities import get_lorenz_shares
-from scipy.optimize import brentq, minimize_scalar, minimize
+from scipy.optimize import brentq, minimize_scalar
 
 from Code.cstw_agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
@@ -396,44 +395,23 @@ def estimate(options, Params):
             # Run the param-dist estimation
 
             t_start = time()
-            # spread_estimate = (
-            #     minimize_scalar(
-            #         find_lorenz_distance_at_target_KY,
-            #         bracket=spread_range,
-            #         args=(
-            #             EstimationEconomy,
-            #             options["param_name"],
-            #             pref_type_count,
-            #             param_range,
-            #             options["dist_type"],
-            #         ),
-            #         tol=1e-4,
-            #         method="brent",
-            #     )
-            # ).x
-            # center_estimate = EstimationEconomy.center_save
+            spread_estimate = (
+                minimize_scalar(
+                    find_lorenz_distance_at_target_KY,
+                    bracket=spread_range,
+                    args=(
+                        EstimationEconomy,
+                        options["param_name"],
+                        pref_type_count,
+                        param_range,
+                        options["dist_type"],
+                    ),
+                    tol=1e-4,
+                    method="brent",
+                )
+            ).x
+            center_estimate = EstimationEconomy.center_save
 
-            x0 = [np.mean(spread_range), np.mean(param_range)]
-
-            res = em.minimize(
-                criterion=get_KY_and_find_lorenz_distance,
-                params=x0,
-                algorithm="scipy_lbfgsb",
-                # algo_options={"n_cores": 20},
-                criterion_kwargs={
-                    "economy": EstimationEconomy,
-                    "param_name": options["param_name"],
-                    "param_count": pref_type_count,
-                    "dist_type": options["dist_type"],
-                },
-                lower_bounds=[spread_range[0], param_range[0]],
-                upper_bounds=[spread_range[1], param_range[1]],
-                multistart=True,
-                numdiff_options={"n_cores": 20},
-            )
-
-            spread_estimate = res.params[0]
-            center_estimate = res.params[1]
             t_end = time()
         else:
             # Run the param-point estimation only

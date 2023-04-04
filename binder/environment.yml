@@ -1,5 +1,12 @@
+name: cstwmpc
+channels:
+  - conda-forge
+  - defaults
 dependencies:
   - python=3.9
+  - matplotlib>=3.7.0
+  - ipython>=8.8.0
+  - econ-ark
   - pip
   - pip:
-      - -r requirements.txt
+      - econ-ark>=0.13.0
