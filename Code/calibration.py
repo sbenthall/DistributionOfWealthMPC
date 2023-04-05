@@ -3,10 +3,11 @@ Loads parameters used in the cstwMPC estimations.
 """
 
 
-import numpy as np
 import csv
-from copy import deepcopy
 import os
+from copy import deepcopy
+
+import numpy as np
 
 SCF_data_file = "SCFwealthDataReduced.txt"  # Name of the SCF data file to use
 # Which points of the Lorenz curve to match in beta-dist (must be in (0,1))
@@ -134,7 +135,6 @@ base_death_probs = []
 for j in range(len(raw_actuarial)):
     # This effectively assumes that everyone is a white woman
     base_death_probs += [float(raw_actuarial[j][4])]
-f.close
 
 # Import adjustments for education and apply them to the base mortality rates
 f = open(data_location + "/" + "EducMortAdj.txt")
@@ -539,8 +539,8 @@ aggregate_params = {
 
 
 def main():
-    print("Sorry, calibrationnew doesn't actually do anything on its own.")
-    print("This module is imported by cstwMPCnew, providing data and calibrated")
+    print("Sorry, `calibration.py` doesn't actually do anything on its own.")
+    print("This module is imported by `estimation.py`, providing data and calibrated")
     print("parameters for the various estimations.  Please see that module if")
     print("you want more interesting output.")
 

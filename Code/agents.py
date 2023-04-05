@@ -1,7 +1,6 @@
 import os
 from copy import copy
 
-import HARK.ConsumptionSaving.ConsIndShockModel as ConsIndShockModel
 import matplotlib.pyplot as plt
 import numpy as np
 from HARK import AgentType, Market
@@ -9,6 +8,7 @@ from HARK.ConsumptionSaving.ConsAggShockModel import (
     AggShockConsumerType,
     CobbDouglasEconomy,
 )
+from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
 from HARK.distribution import DiscreteDistribution, Uniform
 from HARK.utilities import calc_subpop_avg, get_lorenz_shares, get_percentiles
 
@@ -47,7 +47,7 @@ class CstwMPCAgent(AgentType):  # EstimationAgentClass
         self.simulate(1)
 
 
-class DoWAgent(CstwMPCAgent, ConsIndShockModel.IndShockConsumerType):
+class DoWAgent(CstwMPCAgent, IndShockConsumerType):
     pass
 
 
@@ -484,110 +484,47 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
             # Give OS time to make the plot (it only draws when main thread is sleeping)
             plt.pause(2)
 
-        # Make a string of results to display
-        results_string = (
-            "Estimate is center="
-            + str(self.center_estimate)
-            + ", spread="
-            + str(self.spread_estimate)
-            + "\n"
-        )
-        results_string += "Lorenz distance is " + str(self.LorenzDistance) + "\n"
-        results_string += "Average MPC for all consumers is " + mystr(MPCall) + "\n"
-        results_string += (
-            "Average MPC in the top percentile of W/Y is "
-            + mystr(MPCbyWealthRatio[0])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the top decile of W/Y is "
-            + mystr(MPCbyWealthRatio[1])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the top quintile of W/Y is "
-            + mystr(MPCbyWealthRatio[2])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the second quintile of W/Y is "
-            + mystr(MPCbyWealthRatio[3])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the middle quintile of W/Y is "
-            + mystr(MPCbyWealthRatio[4])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the fourth quintile of W/Y is "
-            + mystr(MPCbyWealthRatio[5])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the bottom quintile of W/Y is "
-            + mystr(MPCbyWealthRatio[6])
-            + "\n"
-        )
-        results_string += (
-            "Average MPC in the top percentile of y is " + mystr(MPCbyIncome[0]) + "\n"
-        )
-        results_string += (
-            "Average MPC in the top decile of y is " + mystr(MPCbyIncome[1]) + "\n"
-        )
-        results_string += (
-            "Average MPC in the top quintile of y is " + mystr(MPCbyIncome[2]) + "\n"
-        )
-        results_string += (
-            "Average MPC in the second quintile of y is " + mystr(MPCbyIncome[3]) + "\n"
-        )
-        results_string += (
-            "Average MPC in the middle quintile of y is " + mystr(MPCbyIncome[4]) + "\n"
-        )
-        results_string += (
-            "Average MPC in the fourth quintile of y is " + mystr(MPCbyIncome[5]) + "\n"
-        )
-        results_string += (
-            "Average MPC in the bottom quintile of y is " + mystr(MPCbyIncome[6]) + "\n"
-        )
-        results_string += "Average MPC for the employed is " + mystr(MPCemployed) + "\n"
-        results_string += (
-            "Average MPC for the unemployed is " + mystr(MPCunemployed) + "\n"
-        )
-        results_string += "Average MPC for the retired is " + mystr(MPCretired) + "\n"
-        results_string += "Of the population with the 1/3 highest MPCs..." + "\n"
-        results_string += (
-            mystr(HandToMouthPct[0] * 100)
-            + "% are in the bottom wealth quintile,"
-            + "\n"
-        )
-        results_string += (
-            mystr(HandToMouthPct[1] * 100)
-            + "% are in the second wealth quintile,"
-            + "\n"
-        )
-        results_string += (
-            mystr(HandToMouthPct[2] * 100)
-            + "% are in the third wealth quintile,"
-            + "\n"
-        )
-        results_string += (
-            mystr(HandToMouthPct[3] * 100)
-            + "% are in the fourth wealth quintile,"
-            + "\n"
-        )
-        results_string += (
-            "and "
-            + mystr(HandToMouthPct[4] * 100)
-            + "% are in the top wealth quintile."
-            + "\n"
-        )
+        # Create a list of strings to concatenate
+        results_list = [
+            f"Estimate is center={self.center_estimate}, spread={self.spread_estimate}\n",
+            f"Lorenz distance is {self.LorenzDistance}\n",
+            f"Average MPC for all consumers is {mystr(MPCall)}\n",
+            f"Average MPC in the top percentile of W/Y is {mystr(MPCbyWealthRatio[0])}\n",
+            f"Average MPC in the top decile of W/Y is {mystr(MPCbyWealthRatio[1])}\n",
+            f"Average MPC in the top quintile of W/Y is {mystr(MPCbyWealthRatio[2])}\n",
+            f"Average MPC in the second quintile of W/Y is {mystr(MPCbyWealthRatio[3])}\n",
+            f"Average MPC in the middle quintile of W/Y is {mystr(MPCbyWealthRatio[4])}\n",
+            f"Average MPC in the fourth quintile of W/Y is {mystr(MPCbyWealthRatio[5])}\n",
+            f"Average MPC in the bottom quintile of W/Y is {mystr(MPCbyWealthRatio[6])}\n",
+            f"Average MPC in the top percentile of y is {mystr(MPCbyIncome[0])}\n",
+            f"Average MPC in the top decile of y is {mystr(MPCbyIncome[1])}\n",
+            f"Average MPC in the top quintile of y is {mystr(MPCbyIncome[2])}\n",
+            f"Average MPC in the second quintile of y is {mystr(MPCbyIncome[3])}\n",
+            f"Average MPC in the middle quintile of y is {mystr(MPCbyIncome[4])}\n",
+            f"Average MPC in the fourth quintile of y is {mystr(MPCbyIncome[5])}\n",
+            f"Average MPC in the bottom quintile of y is {mystr(MPCbyIncome[6])}\n",
+            f"Average MPC for the employed is {mystr(MPCemployed)}\n",
+            f"Average MPC for the unemployed is {mystr(MPCunemployed)}\n",
+            f"Average MPC for the retired is {mystr(MPCretired)}\n",
+            "Of the population with the 1/3 highest MPCs...\n",
+            f"{mystr(HandToMouthPct[0] * 100)}% are in the bottom wealth quintile,\n",
+            f"{mystr(HandToMouthPct[1] * 100)}% are in the second wealth quintile,\n",
+            f"{mystr(HandToMouthPct[2] * 100)}% are in the third wealth quintile,\n",
+            f"{mystr(HandToMouthPct[3] * 100)}% are in the fourth wealth quintile,\n",
+            f"and {mystr(HandToMouthPct[4] * 100)}% are in the top wealth quintile.\n",
+        ]
+
+        # Concatenate the list into a single string
+        results_string = "".join(results_list)
+
         print(results_string)
 
         # Save results to disk
         if spec_name is not None:
             with open(
-                self.my_file_path + "/Results/" + spec_name + "Results.txt", "w"
+                self.my_file_path + "/Results/" + spec_name + "Results.txt",
+                "w",
+                encoding="utf-8",
             ) as f:
                 f.write(results_string)
                 f.close()

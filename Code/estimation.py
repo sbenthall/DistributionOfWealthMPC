@@ -41,8 +41,6 @@ from scipy.optimize import brentq, minimize_scalar
 
 from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
-# import calibration as params
-
 
 def mystr(number):
     return f"{number:.3f}"
