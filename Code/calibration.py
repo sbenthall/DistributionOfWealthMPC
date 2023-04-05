@@ -541,7 +541,7 @@ aggregate_params = {
 
 
 def main():
-    print("Sorry, SetupParamsCSTWnew doesn't actually do anything on its own.")
+    print("Sorry, calibrationnew doesn't actually do anything on its own.")
     print("This module is imported by cstwMPCnew, providing data and calibrated")
     print("parameters for the various estimations.  Please see that module if")
     print("you want more interesting output.")

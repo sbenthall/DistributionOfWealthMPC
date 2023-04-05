@@ -1,6 +1,6 @@
 """
 This module / script makes some fairly simple figures used in a version of the slides.
-All Booleans at the top of SetupParamsCSTW should be set to False, as this module
+All Booleans at the top of calibration should be set to False, as this module
 imports cstwMPC; there's no need to actually do anything but load the model.
 """
 from __future__ import absolute_import, division, print_function
@@ -49,13 +49,13 @@ def doCforBetaEquals(beta, m):
     InfiniteType.unpack_cFunc()
 
     c = InfiniteType.cFunc[0](m)
-    InfiniteType.beta = Params.beta_guess
+    InfiniteType.beta = params.beta_guess
 
     InfiniteType.simulateCSTWc()
     m_hist = InfiniteType.m_history
     m_temp = np.reshape(
-        m_hist[100 : Params.sim_periods, :],
-        ((Params.sim_periods - 100) * Params.sim_pop_size, 1),
+        m_hist[100 : params.sim_periods, :],
+        ((params.sim_periods - 100) * params.sim_pop_size, 1),
     )
     n = m_temp.size
     h = m[2] - m[0]
@@ -73,48 +73,32 @@ pdf_array = np.zeros((17, points)) + np.nan
 for b in range(17):
     beta = 0.978 + b * 0.001
     (
-        c_array[
-            b,
-        ],
-        pdf_array[
-            b,
-        ],
+        c_array[b,],
+        pdf_array[b,],
     ) = doCforBetaEquals(beta, m)
 
 for b in range(17):
     beta = 0.978 + b * 0.001
-    highest = np.max(
-        pdf_array[
-            b,
-        ]
-    )
+    highest = np.max(pdf_array[b,])
     scale = 1.5 / highest
     scale = 4.0
     plt.ylim(0, 2.5)
     plt.plot(
         m,
-        scale
-        * pdf_array[
-            b,
-        ],
+        scale * pdf_array[b,],
         "-c",
     )
     plt.fill_between(
         m,
         np.zeros(m.shape),
-        scale
-        * pdf_array[
-            b,
-        ],
+        scale * pdf_array[b,],
         facecolor="c",
         alpha=0.5,
     )
     plt.plot(m, mTargFunc(m), "-r")
     plt.plot(
         m,
-        c_array[
-            b,
-        ],
+        c_array[b,],
         "-k",
         linewidth=1.5,
     )
@@ -127,9 +111,7 @@ for b in range(17):
 
 plt.plot(
     m,
-    c_array[
-        12,
-    ],
+    c_array[12,],
     "-k",
     linewidth=1.5,
 )
@@ -144,11 +126,7 @@ plt.savefig(my_file_path + "/Figures/mTargBase.pdf")
 plt.fill_between(
     m,
     np.zeros(m.shape),
-    scale
-    * 2
-    * pdf_array[
-        12,
-    ],
+    scale * 2 * pdf_array[12,],
     facecolor="c",
     alpha=0.5,
 )
@@ -171,11 +149,7 @@ plt.plot(np.array([9.95, 9.95]), np.array([0, 1.5]), "--k")
 plt.fill_between(
     m,
     np.zeros(m.shape),
-    scale
-    * 2
-    * pdf_array[
-        12,
-    ],
+    scale * 2 * pdf_array[12,],
     facecolor="c",
     alpha=0.5,
 )
@@ -188,9 +162,7 @@ plt.xlim(0, 30)
 for b in range(17):
     plt.plot(
         m,
-        c_array[
-            b,
-        ],
+        c_array[b,],
         "-k",
         linewidth=1.5,
     )
@@ -218,11 +190,7 @@ plt.savefig(my_file_path + "/Figures/kappaFuncLowBeta.pdf")
 plt.fill_between(
     m,
     np.zeros(m.shape),
-    scale
-    * 0.33
-    * pdf_array[
-        2,
-    ],
+    scale * 0.33 * pdf_array[2,],
     facecolor="c",
     alpha=0.5,
 )

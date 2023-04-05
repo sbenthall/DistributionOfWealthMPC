@@ -41,9 +41,9 @@ import numpy as np
 from HARK.utilities import get_lorenz_shares
 from scipy.optimize import brentq, minimize_scalar
 
-from Code.cstw_agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
+from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
-# import SetupParamsCSTW as Params
+# import calibration as params
 
 
 def mystr(number):
@@ -259,7 +259,7 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
 ###############################################################################
 
 
-def estimate(options, Params):
+def estimate(options, params):
     (
         spec_name,
         pref_type_count,
@@ -274,8 +274,8 @@ def estimate(options, Params):
             (
                 np.array(0.0),
                 get_lorenz_shares(
-                    Params.SCF_wealth,
-                    weights=Params.SCF_weights,
+                    params.SCF_wealth,
+                    weights=params.SCF_weights,
                     percentiles=np.arange(0.01, 1.0, 0.01).tolist(),
                 ),
                 np.array(1.0),
@@ -284,16 +284,16 @@ def estimate(options, Params):
         KY_target = 6.60
     else:  # This is hacky until I can find the liquid wealth data and import it
         lorenz_target = get_lorenz_shares(
-            Params.SCF_wealth,
-            weights=Params.SCF_weights,
-            percentiles=Params.percentiles_to_match,
+            params.SCF_wealth,
+            weights=params.SCF_weights,
+            percentiles=params.percentiles_to_match,
         )
         lorenz_long_data = np.hstack(
             (
                 np.array(0.0),
                 get_lorenz_shares(
-                    Params.SCF_wealth,
-                    weights=Params.SCF_weights,
+                    params.SCF_wealth,
+                    weights=params.SCF_weights,
                     percentiles=np.arange(0.01, 1.0, 0.01).tolist(),
                 ),
                 np.array(1.0),
@@ -305,24 +305,24 @@ def estimate(options, Params):
     # Set total number of simulated agents in the population
     if options["do_param_dist"]:
         if options["do_agg_shocks"]:
-            Population = Params.pop_sim_agg_dist
+            Population = params.pop_sim_agg_dist
         else:
-            Population = Params.pop_sim_ind_dist
+            Population = params.pop_sim_ind_dist
     else:
         if options["do_agg_shocks"]:
-            Population = Params.pop_sim_agg_point
+            Population = params.pop_sim_agg_point
         else:
-            Population = Params.pop_sim_ind_point
+            Population = params.pop_sim_ind_point
 
     # Make AgentTypes for estimation
     if options["do_lifecycle"]:
-        DropoutType = EstimationAgentClass(**Params.init_dropout)
+        DropoutType = EstimationAgentClass(**params.init_dropout)
         DropoutType.AgeDstn = calc_stationary_age_dstn(DropoutType.LivPrb, True)
         HighschoolType = deepcopy(DropoutType)
-        HighschoolType(**Params.adj_highschool)
+        HighschoolType(**params.adj_highschool)
         HighschoolType.AgeDstn = calc_stationary_age_dstn(HighschoolType.LivPrb, True)
         CollegeType = deepcopy(DropoutType)
-        CollegeType(**Params.adj_college)
+        CollegeType(**params.adj_college)
         CollegeType.AgeDstn = calc_stationary_age_dstn(CollegeType.LivPrb, True)
         DropoutType.update()
         HighschoolType.update()
@@ -334,9 +334,9 @@ def estimate(options, Params):
             EstimationAgentList.append(deepcopy(CollegeType))
     else:
         if options["do_agg_shocks"]:
-            PerpetualYouthType = EstimationAgentClass(**Params.init_agg_shocks)
+            PerpetualYouthType = EstimationAgentClass(**params.init_agg_shocks)
         else:
-            PerpetualYouthType = EstimationAgentClass(**Params.init_infinite)
+            PerpetualYouthType = EstimationAgentClass(**params.init_infinite)
         PerpetualYouthType.AgeDstn = np.array(1.0)
         EstimationAgentList = []
         for n in range(pref_type_count):
@@ -347,7 +347,7 @@ def estimate(options, Params):
         EstimationAgentList[j].seed = j
 
     # Make an economy for the consumers to live in
-    market_dict = copy(Params.init_market)
+    market_dict = copy(params.init_market)
     market_dict["AggShockBool"] = options["do_agg_shocks"]
     market_dict["Population"] = Population
     EstimationEconomy = EstimationMarketClass(**market_dict)
@@ -356,18 +356,18 @@ def estimate(options, Params):
     EstimationEconomy.LorenzTarget = lorenz_target
     EstimationEconomy.LorenzData = lorenz_long_data
     if options["do_lifecycle"]:
-        EstimationEconomy.assign_parameters(PopGroFac=Params.PopGroFac)
-        EstimationEconomy.assign_parameters(TypeWeight=Params.TypeWeight_lifecycle)
-        EstimationEconomy.assign_parameters(T_retire=Params.working_T - 1)
-        EstimationEconomy.assign_parameters(act_T=Params.T_sim_LC)
-        EstimationEconomy.assign_parameters(ignore_periods=Params.ignore_periods_LC)
+        EstimationEconomy.assign_parameters(PopGroFac=params.PopGroFac)
+        EstimationEconomy.assign_parameters(TypeWeight=params.TypeWeight_lifecycle)
+        EstimationEconomy.assign_parameters(T_retire=params.working_T - 1)
+        EstimationEconomy.assign_parameters(act_T=params.T_sim_LC)
+        EstimationEconomy.assign_parameters(ignore_periods=params.ignore_periods_LC)
     else:
         EstimationEconomy.assign_parameters(PopGroFac=1.0)
         EstimationEconomy.assign_parameters(TypeWeight=[1.0])
-        EstimationEconomy.assign_parameters(act_T=Params.T_sim_PY)
-        EstimationEconomy.assign_parameters(ignore_periods=Params.ignore_periods_PY)
+        EstimationEconomy.assign_parameters(act_T=params.T_sim_PY)
+        EstimationEconomy.assign_parameters(ignore_periods=params.ignore_periods_PY)
     if options["do_agg_shocks"]:
-        EstimationEconomy(**Params.aggregate_params)
+        EstimationEconomy(**params.aggregate_params)
         EstimationEconomy.update()
         EstimationEconomy.makeAggShkHist()
 

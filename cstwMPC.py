@@ -33,16 +33,14 @@ import matplotlib.pyplot as plt  # Plotting tools
 import numpy as np
 from HARK.utilities import get_lorenz_shares
 
-import Code.SetupParamsCSTW as Params
-from Code.cstwMPC_MAIN import estimate
-from Code.SetupParamsCSTW import SCF_wealth, SCF_weights
+from Code.calibration import SCF_wealth, SCF_weights
+from Code.estimation import estimate
 
 warnings.filterwarnings("ignore")
 
 
 def mystr(number):
     return "{:.4f}".format(number)
-
 
 
 # %% [markdown]
