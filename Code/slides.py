@@ -3,10 +3,8 @@ This module / script makes some fairly simple figures used in a version of the s
 All Booleans at the top of calibration should be set to False, as this module
 imports cstwMPC; there's no need to actually do anything but load the model.
 """
-from __future__ import absolute_import, division, print_function
 
 import os
-from builtins import range, str
 
 import matplotlib.pyplot as plt
 
@@ -30,11 +28,11 @@ def mTargFunc(x):
 
 
 def mystr(number):
-    return "{:.3f}".format(number)
+    return f"{number:.3f}"
 
 
 def mystrx(number):
-    return "{:.0f}".format(number)
+    return f"{number:.0f}"
 
 
 def epaKernel(X):

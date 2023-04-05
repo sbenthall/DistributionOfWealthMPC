@@ -31,9 +31,7 @@ path_to_models : str
 All of these parameters are set when running this file from one of the do_XXX.py
 files in the root directory.
 """
-from __future__ import absolute_import, division, print_function
 
-from builtins import range, str
 from copy import copy, deepcopy
 from time import time
 
@@ -47,7 +45,7 @@ from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
 
 def mystr(number):
-    return "{:.3f}".format(number)
+    return f"{number:.3f}"
 
 
 def process_options(options):

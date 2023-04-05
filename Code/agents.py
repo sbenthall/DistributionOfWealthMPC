@@ -16,7 +16,7 @@ here = os.path.dirname(os.path.realpath(__file__))
 
 
 def mystr(number):
-    return "{:.3f}".format(number)
+    return f"{number:.3f}"
 
 
 class CstwMPCAgent(AgentType):  # EstimationAgentClass

@@ -3,7 +3,6 @@ This module makes some figures for cstwMPC.  It requires that quite a few specif
 of the model have been estimated, with the results stored in ./Results.
 """
 
-from builtins import range
 import matplotlib.pyplot as plt
 import csv
 import numpy as np
@@ -13,7 +12,7 @@ import os
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 
-f = open(my_file_path + "/Results/LCbetaPointNetWorthLorenzFig.txt", "r")
+f = open(my_file_path + "/Results/LCbetaPointNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 lorenz_percentiles = []
@@ -28,7 +27,7 @@ lorenz_percentiles = np.array(lorenz_percentiles)
 scf_lorenz = np.array(scf_lorenz)
 beta_point_lorenz = np.array(beta_point_lorenz)
 
-f = open(my_file_path + "/Results/LCbetaDistNetWorthLorenzFig.txt", "r")
+f = open(my_file_path + "/Results/LCbetaDistNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_dist_lorenz = []
@@ -37,7 +36,7 @@ for j in range(len(raw_data)):
 f.close()
 beta_dist_lorenz = np.array(beta_dist_lorenz)
 
-f = open(my_file_path + "/Results/LCbetaPointNetWorthMPCfig.txt", "r")
+f = open(my_file_path + "/Results/LCbetaPointNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_percentiles = []
@@ -49,7 +48,7 @@ f.close()
 mpc_percentiles = np.asarray(mpc_percentiles)
 mpc_beta_point = np.asarray(mpc_beta_point)
 
-f = open(my_file_path + "/Results/LCbetaDistNetWorthMPCfig.txt", "r")
+f = open(my_file_path + "/Results/LCbetaDistNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist = []
@@ -58,7 +57,7 @@ for j in range(len(raw_data)):
 f.close()
 mpc_beta_dist = np.asarray(mpc_beta_dist)
 
-f = open(my_file_path + "/Results/LCbetaDistLiquidMPCfig.txt", "r")
+f = open(my_file_path + "/Results/LCbetaDistLiquidMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist_liquid = []
@@ -67,7 +66,7 @@ for j in range(len(raw_data)):
 f.close()
 mpc_beta_dist_liquid = np.asarray(mpc_beta_dist_liquid)
 
-f = open(my_file_path + "/Results/LCbetaDistNetWorthKappaByAge.txt", "r")
+f = open(my_file_path + "/Results/LCbetaDistNetWorthKappaByAge.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 kappa_mean_age = []
@@ -83,7 +82,7 @@ kappa_hi_beta_age = np.array(kappa_hi_beta_age)
 age_list = np.array(list(range(len(kappa_mean_age))), dtype=float) * 0.25 + 24.0
 f.close()
 
-f = open(my_file_path + "/Results/LC_KYbyBeta.txt", "r")
+f = open(my_file_path + "/Results/LC_KYbyBeta.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 KY_by_beta_lifecycle = []
@@ -95,7 +94,7 @@ beta_list = np.array(beta_list)
 KY_by_beta_lifecycle = np.array(KY_by_beta_lifecycle)
 f.close()
 
-f = open(my_file_path + "/Results/IH_KYbyBeta.txt", "r")
+f = open(my_file_path + "/Results/IH_KYbyBeta.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 KY_by_beta_infinite = []
@@ -153,7 +152,7 @@ plt.savefig(my_file_path + "/Figures/KYratioByBeta.pdf")
 plt.show()
 
 
-f = open(my_file_path + "/Results/IHbetaPointNetWorthLorenzFig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaPointNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 lorenz_percentiles = []
@@ -168,7 +167,7 @@ lorenz_percentiles = np.array(lorenz_percentiles)
 scf_lorenz = np.array(scf_lorenz)
 beta_point_lorenz = np.array(beta_point_lorenz)
 
-f = open(my_file_path + "/Results/IHbetaDistNetWorthLorenzFig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaDistNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_dist_lorenz = []
@@ -178,7 +177,7 @@ f.close()
 beta_dist_lorenz = np.array(beta_dist_lorenz)
 
 
-f = open(my_file_path + "/Results/IHbetaPointLiquidLorenzFig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaPointLiquidLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_point_lorenz_liquid = []
@@ -187,7 +186,7 @@ for j in range(len(raw_data)):
 f.close()
 beta_point_lorenz_liquid = np.array(beta_point_lorenz_liquid)
 
-f = open(my_file_path + "/Results/IHbetaDistLiquidLorenzFig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaDistLiquidLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_dist_lorenz_liquid = []
@@ -196,7 +195,7 @@ for j in range(len(raw_data)):
 f.close()
 beta_dist_lorenz_liquid = np.array(beta_dist_lorenz_liquid)
 
-f = open(my_file_path + "/Results/IHbetaPointNetWorthMPCfig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaPointNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_percentiles = []
@@ -208,7 +207,7 @@ f.close()
 mpc_percentiles = np.asarray(mpc_percentiles)
 mpc_beta_point = np.asarray(mpc_beta_point)
 
-f = open(my_file_path + "/Results/IHbetaDistNetWorthMPCfig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaDistNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist = []
@@ -217,7 +216,7 @@ for j in range(len(raw_data)):
 f.close()
 mpc_beta_dist = np.asarray(mpc_beta_dist)
 
-f = open(my_file_path + "/Results/IHbetaDistLiquidMPCfig.txt", "r")
+f = open(my_file_path + "/Results/IHbetaDistLiquidMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist_liquid = []
@@ -277,43 +276,43 @@ plt.savefig(my_file_path + "/Figures/MPCdistInfinite.pdf")
 plt.show()
 
 
-f = open(my_file_path + "/Results/SensitivityRho.txt", "r")
+f = open(my_file_path + "/Results/SensitivityRho.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 rho_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityXiSigma.txt", "r")
+f = open(my_file_path + "/Results/SensitivityXiSigma.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 xi_sigma_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityPsiSigma.txt", "r")
+f = open(my_file_path + "/Results/SensitivityPsiSigma.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 psi_sigma_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityMu.txt", "r")
+f = open(my_file_path + "/Results/SensitivityMu.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mu_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityUrate.txt", "r")
+f = open(my_file_path + "/Results/SensitivityUrate.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 urate_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityMortality.txt", "r")
+f = open(my_file_path + "/Results/SensitivityMortality.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mortality_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityG.txt", "r")
+f = open(my_file_path + "/Results/SensitivityG.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 g_sensitivity = np.array(raw_data)
@@ -357,7 +356,7 @@ plt.yticks([0.22, 0.26, 0.30, 0.34], [])
 plt.text(0.03, 0.34, "Unemployment", fontsize=11)
 plt.text(0.055, 0.32, r"rate $\mho$", fontsize=11)
 
-"""
+r"""
 plt.subplot(2,3,6,xticks=[0.004,0.008,0.012],xlim=(0.003,0.0125),ylim=(0.21,0.36))
 plt.plot(mortality_sensitivity[:,0],mortality_sensitivity[:,1],'-k',linewidth=1)
 plt.plot(0.00625,kappa,'.k',markersize=8)
@@ -413,7 +412,7 @@ plt.yticks([0.95, 0.96, 0.97, 0.98, 0.99, 1.0], [])
 plt.text(0.03, 0.9625, "Unemployment", fontsize=11)
 plt.text(0.055, 0.955, r"rate $\mho$", fontsize=11)
 
-"""
+r"""
 plt.subplot(2,3,6,xticks=[0.004,0.008,0.012],xlim=(0.003,0.0125),ylim=(0.95,1.0))
 plt.plot(mortality_sensitivity[:,0],mortality_sensitivity[:,2],'-k',linewidth=1)
 plt.plot(0.00625,beta,'.k',markersize=8)
@@ -469,7 +468,7 @@ plt.yticks([0, 0.01, 0.02, 0.03, 0.04, 0.05], [])
 plt.text(0.03, 0.0475, "Unemployment", fontsize=11)
 plt.text(0.055, 0.04, r"rate $\mho$", fontsize=11)
 
-"""
+r"""
 plt.subplot(2,3,6,xticks=[0.004,0.008,0.012],xlim=(0.003,0.0125),ylim=(0.000,0.055))
 plt.plot(mortality_sensitivity[:,0],mortality_sensitivity[:,3],'-k',linewidth=1)
 plt.plot(0.00625,nabla,'.k',markersize=8)
@@ -526,7 +525,7 @@ plt.yticks([1, 3, 5, 7, 9], [])
 plt.text(0.03, 8.5, "Unemployment", fontsize=11)
 plt.text(0.055, 7.25, r"rate $\mho$", fontsize=11)
 
-"""
+r"""
 plt.subplot(2,3,6,xticks=[0.004,0.008,0.012],xlim=(0.003,0.0125),ylim=(0,10))
 plt.plot(mortality_sensitivity[:,0],mortality_sensitivity[:,4],'-k',linewidth=1)
 plt.plot(0.00625,fit,'.k',markersize=8)

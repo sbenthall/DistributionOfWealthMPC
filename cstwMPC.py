@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
@@ -40,7 +39,7 @@ warnings.filterwarnings("ignore")
 
 
 def mystr(number):
-    return "{:.4f}".format(number)
+    return f"{number:.4f}"
 
 
 # %% [markdown]
