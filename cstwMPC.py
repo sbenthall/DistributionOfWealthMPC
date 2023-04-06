@@ -32,6 +32,7 @@ import matplotlib.pyplot as plt  # Plotting tools
 import numpy as np
 from HARK.utilities import get_lorenz_shares
 
+import Code.calibration as parameters
 from Code.calibration import SCF_wealth, SCF_weights
 from Code.estimation import estimate
 
@@ -190,7 +191,7 @@ options = {
 }
 
 
-EstimationEconomy = estimate(options, Params)
+EstimationEconomy = estimate(options, parameters)
 
 
 # %%
@@ -273,10 +274,11 @@ options = {
     "do_lifecycle": do_lifecycle,
     "do_agg_shocks": do_agg_shocks,
     "do_liquid": do_liquid,
+    "do_combo_estimation": True,
 }
 
 
-EstimationEconomy = estimate(options, Params)
+EstimationEconomy = estimate(options, parameters)
 
 # %%
 # Construct the Lorenz curves and plot them

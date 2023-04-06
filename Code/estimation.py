@@ -37,7 +37,7 @@ from time import time
 
 import numpy as np
 from HARK.utilities import get_lorenz_shares
-from scipy.optimize import minimize_scalar, root_scalar
+from scipy.optimize import minimize_scalar, root_scalar, minimize
 
 from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
@@ -144,7 +144,7 @@ def find_lorenz_distance_at_target_ky(
 def get_target_ky_and_find_lorenz_distance(
     x, economy=None, param_name=None, param_count=None, dist_type=None
 ):
-    spread, center = x
+    center, spread = x
     # Make sure we actually calculate simulated Lorenz points
     economy.assign_parameters(LorenzBool=True, ManyStatsBool=False)
     # Distribute parameters
@@ -412,24 +412,45 @@ def estimate(options, params):
         if options["do_param_dist"]:
             # Run the param-dist estimation
 
-            t_start = time()
-            spread_estimate = (
-                minimize_scalar(
-                    find_lorenz_distance_at_target_ky,
-                    bounds=spread_range,
+            if options["do_combo_estimation"]:
+                t_start = time()
+
+                results = minimize(
+                    get_target_ky_and_find_lorenz_distance,
+                    [0.9867, 0.0067],
                     args=(
                         economy,
                         options["param_name"],
                         pref_count,
-                        param_range,
                         options["dist_type"],
                     ),
-                    tol=1e-4,
+                    bounds=[param_range, spread_range],
                 )
-            ).x
-            center_estimate = economy.center_save
 
-            t_end = time()
+                t_end = time()
+
+                center_estimate, spread_estimate = results.x
+
+            else:
+
+                t_start = time()
+                spread_estimate = (
+                    minimize_scalar(
+                        find_lorenz_distance_at_target_ky,
+                        bounds=spread_range,
+                        args=(
+                            economy,
+                            options["param_name"],
+                            pref_count,
+                            param_range,
+                            options["dist_type"],
+                        ),
+                        tol=1e-4,
+                    )
+                ).x
+                center_estimate = economy.center_save
+
+                t_end = time()
         else:
             # Run the param-point estimation only
 
