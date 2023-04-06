@@ -9,7 +9,7 @@ from HARK.ConsumptionSaving.ConsAggShockModel import (
     CobbDouglasEconomy,
 )
 from HARK.ConsumptionSaving.ConsIndShockModel import IndShockConsumerType
-from HARK.distribution import DiscreteDistribution, Uniform
+from HARK.distribution import DiscreteDistribution, Lognormal, Uniform
 from HARK.utilities import calc_subpop_avg, get_lorenz_shares, get_percentiles
 
 here = os.path.dirname(os.path.realpath(__file__))
@@ -105,6 +105,8 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
             ]
             self.dyn_vars = ["AFunc"]
             self.max_loops = 20
+
+        self.center_save = None
 
         # Save the current file's directory location for writing output:
         self.my_file_path = here

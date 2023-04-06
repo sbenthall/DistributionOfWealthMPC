@@ -2,7 +2,7 @@
 This module runs a custom model specification, with all options specified by the user.
 """
 
-import Code.calibration as params
+import Code.calibration as parameters
 from Code.estimation import estimate
 
 param_name = "DiscFac"  # Which parameter to introduce heterogeneity in
@@ -36,4 +36,4 @@ options = {
 }
 
 # Run the custom model
-estimate(options, params)
+estimate(options, parameters)

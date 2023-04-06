@@ -5,7 +5,7 @@ Will run both beta-point and beta-dist versions.
 """
 
 
-import Code.calibration as params
+import Code.calibration as parameters
 from Code.estimation import estimate
 from Code.Options.all_options import all_options
 
@@ -17,11 +17,11 @@ basic_options.update(all_options["DoStandardWork"])
 simple_point = basic_options.copy()
 simple_point.update(all_options["SimpleSpecPoint"])
 
-estimate(simple_point, params)
+estimate(simple_point, parameters)
 
 # Run beta-dist model
 
 simple_dist = basic_options.copy()
 simple_dist.update(all_options["SimpleSpecDist"])
 
-estimate(simple_dist, params)
+estimate(simple_dist, parameters)

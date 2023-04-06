@@ -37,7 +37,7 @@ from time import time
 
 import numpy as np
 from HARK.utilities import get_lorenz_shares
-from scipy.optimize import brentq, minimize_scalar
+from scipy.optimize import minimize_scalar, root_scalar
 
 from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
@@ -46,58 +46,7 @@ def mystr(number):
     return f"{number:.3f}"
 
 
-def process_options(options):
-    # Construct the name of the specification from user options
-    if options["param_name"] == "DiscFac":
-        param_text = "beta"
-    elif options["param_name"] == "CRRA":
-        param_text = "rho"
-    else:
-        param_text = options["param_name"]
-
-    if options["do_lifecycle"]:
-        life_text = "LC"
-    else:
-        life_text = "PY"
-
-    if options["do_param_dist"]:
-        model_text = "Dist"
-    else:
-        model_text = "Point"
-
-    if options["do_liquid"]:
-        wealth_text = "Liquid"
-    else:
-        wealth_text = "NetWorth"
-
-    if options["do_agg_shocks"]:
-        shock_text = "Agg"
-    else:
-        shock_text = "Ind"
-
-    spec_name = life_text + param_text + model_text + shock_text + wealth_text
-
-    if options["do_param_dist"]:
-        pref_type_count = 7  # Number of discrete beta types in beta-dist
-    else:
-        pref_type_count = 1  # Just one beta type in beta-point
-
-    if options["do_agg_shocks"]:
-        EstimationAgentClass = AggDoWAgent
-        EstimationMarketClass = AggDoWMarket
-    else:
-        EstimationAgentClass = DoWAgent
-        EstimationMarketClass = DoWMarket
-
-    return (
-        spec_name,
-        pref_type_count,
-        EstimationAgentClass,
-        EstimationMarketClass,
-    )
-
-
-def get_KY_ratio_difference(
+def get_ky_ratio_difference(
     center, economy, param_name, param_count, spread, dist_type
 ):
     """
@@ -124,9 +73,8 @@ def get_KY_ratio_difference(
     diff : float
         Difference between simulated and target capital to income ratio for this economy.
     """
-    economy.assign_parameters(
-        LorenzBool=False, ManyStatsBool=False
-    )  # Make sure we're not wasting time calculating stuff
+    # Make sure we're not wasting time calculating stuff
+    economy.assign_parameters(LorenzBool=False, ManyStatsBool=False)
     # Distribute parameters
     economy.distribute_params(param_name, param_count, center, spread, dist_type)
     economy.solve()
@@ -135,7 +83,7 @@ def get_KY_ratio_difference(
     return diff
 
 
-def find_lorenz_distance_at_target_KY(
+def find_lorenz_distance_at_target_ky(
     spread, economy, param_name, param_count, center_range, dist_type
 ):
     """
@@ -166,24 +114,24 @@ def find_lorenz_distance_at_target_KY(
     """
     # Define the function to search for the correct value of center, then find its zero
 
-    # remove brentq and use minimize_scalar(method="brentq") instead
+    # use more sophisticated discrete distribution with zero mass point at ends of support
     # root finding
-    # use more sophisticaed discrete distribution with zero mass point at ends of support
-    optimal_center = brentq(
-        get_KY_ratio_difference,
-        center_range[0],
-        center_range[1],
+    optimal_center = root_scalar(
+        get_ky_ratio_difference,
         args=(economy, param_name, param_count, spread, dist_type),
+        method="toms748",
+        bracket=center_range,
         xtol=10 ** (-6),
-    )
+    ).root
     economy.center_save = optimal_center
 
     # Get the sum of squared Lorenz distances given the correct distribution of the parameter
     # Make sure we actually calculate simulated Lorenz points
     economy.assign_parameters(LorenzBool=True)
+    # Distribute parameters
     economy.distribute_params(
         param_name, param_count, optimal_center, spread, dist_type
-    )  # Distribute parameters
+    )
     economy.solve_agents()
     economy.make_history()
     dist = economy.calc_lorenz_distance()
@@ -193,7 +141,7 @@ def find_lorenz_distance_at_target_KY(
     return dist
 
 
-def get_KY_and_find_lorenz_distance(
+def get_target_ky_and_find_lorenz_distance(
     x, economy=None, param_name=None, param_count=None, dist_type=None
 ):
     spread, center = x
@@ -230,13 +178,13 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
     AgeDstn : np.array
         Stationary distribution of age.  Stochastic vector with frequencies of each age.
     """
-    T = len(LivPrb)
+    term_age = len(LivPrb)
     if terminal_period:
-        MrkvArray = np.zeros((T + 1, T + 1))
-        top = T
+        MrkvArray = np.zeros((term_age + 1, term_age + 1))
+        top = term_age
     else:
-        MrkvArray = np.zeros((T, T))
-        top = T - 1
+        MrkvArray = np.zeros((term_age, term_age))
+        top = term_age - 1
 
     for t in range(top):
         MrkvArray[t, 0] = 1.0 - LivPrb[t]
@@ -255,18 +203,68 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
 ###############################################################################
 
 
-def estimate(options, params):
-    (
-        spec_name,
-        pref_type_count,
-        EstimationAgentClass,
-        EstimationMarketClass,
-    ) = process_options(options)
+def get_spec_name(options):
 
+    # Construct the name of the specification from user options
+    if options["param_name"] == "DiscFac":
+        param_text = "beta"
+    elif options["param_name"] == "CRRA":
+        param_text = "rho"
+    else:
+        param_text = options["param_name"]
+
+    if options["do_lifecycle"]:
+        life_text = "LC"
+    else:
+        life_text = "PY"
+
+    if options["do_param_dist"]:
+        model_text = "Dist"
+    else:
+        model_text = "Point"
+
+    if options["do_liquid"]:
+        wealth_text = "Liquid"
+    else:
+        wealth_text = "NetWorth"
+
+    if options["do_agg_shocks"]:
+        shock_text = "Agg"
+    else:
+        shock_text = "Ind"
+
+    spec_name = life_text + param_text + model_text + shock_text + wealth_text
+
+    return spec_name
+
+
+def get_pref_count(options):
+
+    if options["do_param_dist"]:
+        pref_count = 7  # Number of discrete beta types in beta-dist
+    else:
+        pref_count = 1  # Just one beta type in beta-point
+
+    return pref_count
+
+
+def get_hark_classes(options):
+
+    if options["do_agg_shocks"]:
+        agent_class = AggDoWAgent
+        market_class = AggDoWMarket
+    else:
+        agent_class = DoWAgent
+        market_class = DoWMarket
+
+    return agent_class, market_class
+
+
+def set_targets(options, params):
     # Set targets for K/Y and the Lorenz curve based on the data
     if options["do_liquid"]:
         lorenz_target = np.array([0.0, 0.004, 0.025, 0.117])
-        lorenz_long_data = np.hstack(
+        lorenz_data = np.hstack(
             (
                 np.array(0.0),
                 get_lorenz_shares(
@@ -277,14 +275,14 @@ def estimate(options, params):
                 np.array(1.0),
             )
         )
-        KY_target = 6.60
+        ky_target = 6.60
     else:  # This is hacky until I can find the liquid wealth data and import it
         lorenz_target = get_lorenz_shares(
             params.SCF_wealth,
             weights=params.SCF_weights,
             percentiles=params.percentiles_to_match,
         )
-        lorenz_long_data = np.hstack(
+        lorenz_data = np.hstack(
             (
                 np.array(0.0),
                 get_lorenz_shares(
@@ -296,82 +294,110 @@ def estimate(options, params):
             )
         )
         # lorenz_target = np.array([-0.002, 0.01, 0.053,0.171])
-        KY_target = 10.26
+        ky_target = 10.26
+
+    return lorenz_target, lorenz_data, ky_target
+
+
+def set_population(options, params):
 
     # Set total number of simulated agents in the population
     if options["do_param_dist"]:
         if options["do_agg_shocks"]:
-            Population = params.pop_sim_agg_dist
+            population = params.pop_sim_agg_dist
         else:
-            Population = params.pop_sim_ind_dist
+            population = params.pop_sim_ind_dist
     else:
         if options["do_agg_shocks"]:
-            Population = params.pop_sim_agg_point
+            population = params.pop_sim_agg_point
         else:
-            Population = params.pop_sim_ind_point
+            population = params.pop_sim_ind_point
+
+    return population
+
+
+def make_agents(options, params, agent_class, pref_count):
 
     # Make AgentTypes for estimation
     if options["do_lifecycle"]:
-        DropoutType = EstimationAgentClass(**params.init_dropout)
-        DropoutType.AgeDstn = calc_stationary_age_dstn(DropoutType.LivPrb, True)
-        HighschoolType = deepcopy(DropoutType)
-        HighschoolType(**params.adj_highschool)
-        HighschoolType.AgeDstn = calc_stationary_age_dstn(HighschoolType.LivPrb, True)
-        CollegeType = deepcopy(DropoutType)
-        CollegeType(**params.adj_college)
-        CollegeType.AgeDstn = calc_stationary_age_dstn(CollegeType.LivPrb, True)
-        DropoutType.update()
-        HighschoolType.update()
-        CollegeType.update()
-        EstimationAgentList = []
-        for n in range(pref_type_count):
-            EstimationAgentList.append(deepcopy(DropoutType))
-            EstimationAgentList.append(deepcopy(HighschoolType))
-            EstimationAgentList.append(deepcopy(CollegeType))
+        dropout_type = agent_class(**params.init_dropout)
+        dropout_type.AgeDstn = calc_stationary_age_dstn(dropout_type.LivPrb, True)
+        highschool_type = deepcopy(dropout_type)
+        highschool_type(**params.adj_highschool)
+        highschool_type.AgeDstn = calc_stationary_age_dstn(highschool_type.LivPrb, True)
+        college_type = deepcopy(dropout_type)
+        college_type(**params.adj_college)
+        college_type.AgeDstn = calc_stationary_age_dstn(college_type.LivPrb, True)
+        dropout_type.update()
+        highschool_type.update()
+        college_type.update()
+        agent_list = []
+        for n in range(pref_count):
+            agent_list.append(deepcopy(dropout_type))
+            agent_list.append(deepcopy(highschool_type))
+            agent_list.append(deepcopy(college_type))
     else:
         if options["do_agg_shocks"]:
-            PerpetualYouthType = EstimationAgentClass(**params.init_agg_shocks)
+            perpetualyouth_type = agent_class(**params.init_agg_shocks)
         else:
-            PerpetualYouthType = EstimationAgentClass(**params.init_infinite)
-        PerpetualYouthType.AgeDstn = np.array(1.0)
-        EstimationAgentList = []
-        for n in range(pref_type_count):
-            EstimationAgentList.append(deepcopy(PerpetualYouthType))
+            perpetualyouth_type = agent_class(**params.init_infinite)
+        perpetualyouth_type.AgeDstn = np.array(1.0)
+        agent_list = []
+        for n in range(pref_count):
+            agent_list.append(deepcopy(perpetualyouth_type))
+
+    return agent_list
+
+
+def set_up_economy(options, params, pref_count):
+
+    agent_class, market_class = get_hark_classes(options)
+    agent_list = make_agents(options, params, agent_class, pref_count)
 
     # Give all the AgentTypes different seeds
-    for j in range(len(EstimationAgentList)):
-        EstimationAgentList[j].seed = j
+    for j, agent in enumerate(agent_list):
+        agent.seed = j
 
     # Make an economy for the consumers to live in
     market_dict = copy(params.init_market)
     market_dict["AggShockBool"] = options["do_agg_shocks"]
-    market_dict["Population"] = Population
-    EstimationEconomy = EstimationMarketClass(**market_dict)
-    EstimationEconomy.agents = EstimationAgentList
-    EstimationEconomy.KYratioTarget = KY_target
-    EstimationEconomy.LorenzTarget = lorenz_target
-    EstimationEconomy.LorenzData = lorenz_long_data
+    market_dict["Population"] = set_population(options, params)
+    economy = market_class(**market_dict)
+    economy.agents = agent_list
+    (
+        economy.LorenzTarget,
+        economy.LorenzData,
+        economy.KYratioTarget,
+    ) = set_targets(options, params)
     if options["do_lifecycle"]:
-        EstimationEconomy.assign_parameters(PopGroFac=params.PopGroFac)
-        EstimationEconomy.assign_parameters(TypeWeight=params.TypeWeight_lifecycle)
-        EstimationEconomy.assign_parameters(T_retire=params.working_T - 1)
-        EstimationEconomy.assign_parameters(act_T=params.T_sim_LC)
-        EstimationEconomy.assign_parameters(ignore_periods=params.ignore_periods_LC)
+        economy.assign_parameters(PopGroFac=params.PopGroFac)
+        economy.assign_parameters(TypeWeight=params.TypeWeight_lifecycle)
+        economy.assign_parameters(T_retire=params.working_T - 1)
+        economy.assign_parameters(act_T=params.T_sim_LC)
+        economy.assign_parameters(ignore_periods=params.ignore_periods_LC)
     else:
-        EstimationEconomy.assign_parameters(PopGroFac=1.0)
-        EstimationEconomy.assign_parameters(TypeWeight=[1.0])
-        EstimationEconomy.assign_parameters(act_T=params.T_sim_PY)
-        EstimationEconomy.assign_parameters(ignore_periods=params.ignore_periods_PY)
+        economy.assign_parameters(PopGroFac=1.0)
+        economy.assign_parameters(TypeWeight=[1.0])
+        economy.assign_parameters(act_T=params.T_sim_PY)
+        economy.assign_parameters(ignore_periods=params.ignore_periods_PY)
     if options["do_agg_shocks"]:
-        EstimationEconomy(**params.aggregate_params)
-        EstimationEconomy.update()
-        EstimationEconomy.makeAggShkHist()
+        economy(**params.aggregate_params)
+        economy.update()
+        economy.make_AggShkHist()
+
+    return economy
+
+
+def estimate(options, params):
+
+    spec_name = get_spec_name(options)
+    pref_count = get_pref_count(options)
+
+    economy = set_up_economy(options, params, pref_count)
 
     # Estimate the model as requested
     if options["run_estimation"]:
-        print(
-            "Beginning an estimation with the specification name " + spec_name + "..."
-        )
+        print(f"Beginning an estimation with the specification name {spec_name}...")
 
         # Choose the bounding region for the parameter search
         if options["param_name"] == "CRRA":
@@ -381,11 +407,7 @@ def estimate(options, params):
             param_range = [0.95, 0.995]
             spread_range = [0.006, 0.008]
         else:
-            print(
-                "Parameter range for "
-                + options["param_name"]
-                + " has not been defined!"
-            )
+            print(f"Parameter range for {options['param_name']} has not been defined!")
 
         if options["do_param_dist"]:
             # Run the param-dist estimation
@@ -393,72 +415,73 @@ def estimate(options, params):
             t_start = time()
             spread_estimate = (
                 minimize_scalar(
-                    find_lorenz_distance_at_target_KY,
-                    bracket=spread_range,
+                    find_lorenz_distance_at_target_ky,
+                    bounds=spread_range,
                     args=(
-                        EstimationEconomy,
+                        economy,
                         options["param_name"],
-                        pref_type_count,
+                        pref_count,
                         param_range,
                         options["dist_type"],
                     ),
                     tol=1e-4,
-                    method="brent",
                 )
             ).x
-            center_estimate = EstimationEconomy.center_save
+            center_estimate = economy.center_save
 
             t_end = time()
         else:
             # Run the param-point estimation only
 
             t_start = time()
-            center_estimate = brentq(
-                get_KY_ratio_difference,
-                param_range[0],
-                param_range[1],
+            center_estimate = root_scalar(
+                get_ky_ratio_difference,
                 args=(
-                    EstimationEconomy,
+                    economy,
                     options["param_name"],
-                    pref_type_count,
+                    pref_count,
                     0.0,
                     options["dist_type"],
                 ),
+                method="toms748",
+                bracket=param_range,
                 xtol=1e-6,
-            )
+            ).root
             spread_estimate = 0.0
             t_end = time()
 
         # Display statistics about the estimated model
-        EstimationEconomy.assign_parameters(LorenzBool=True)
-        EstimationEconomy.assign_parameters(ManyStatsBool=True)
-        EstimationEconomy.distribute_params(
+        economy.assign_parameters(LorenzBool=True)
+        economy.assign_parameters(ManyStatsBool=True)
+        economy.distribute_params(
             options["param_name"],
-            pref_type_count,
+            pref_count,
             center_estimate,
             spread_estimate,
             options["dist_type"],
         )
-        EstimationEconomy.solve()
-        EstimationEconomy.calc_lorenz_distance()
+        economy.solve()
+        economy.calc_lorenz_distance()
         print(
-            "Estimate is center="
-            + str(center_estimate)
-            + ", spread="
-            + str(spread_estimate)
-            + ", took "
-            + str(t_end - t_start)
-            + " seconds."
+            f"Estimate is center={center_estimate}, spread={spread_estimate}, "
+            f"took {t_end - t_start} seconds."
         )
-        EstimationEconomy.center_estimate = center_estimate
-        EstimationEconomy.spread_estimate = spread_estimate
-        EstimationEconomy.show_many_stats(spec_name)
+
+        economy.center_estimate = center_estimate
+        economy.spread_estimate = spread_estimate
+        economy.show_many_stats(spec_name)
         print(
             "These results have been saved to ./Code/Results/" + spec_name + ".txt\n\n"
         )
 
-    return EstimationEconomy
+    return economy
 
 
 if __name__ == "__main__":
-    estimate()
+
+    import Code.calibration as parameters
+    from Code.Options.all_options import all_options
+
+    basic_options = all_options["UseUniformBetaDist"].copy()
+    basic_options.update(all_options["DoStandardWork"])
+    estimate(basic_options, parameters)
