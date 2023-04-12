@@ -135,7 +135,7 @@ for filename, targets in results_files_and_targets.items():
 
         for key, target in targets.items():
             if "MPC" in key:
-                MPC_re = re.compile(fr"{key} is ([\d\.]+)")
+                MPC_re = re.compile(rf"{key} is ([\d\.]+)")
 
                 data_point = float(MPC_re.search(data)[1])
 
@@ -143,7 +143,7 @@ for filename, targets in results_files_and_targets.items():
                 t_ceiling = target + MPC_tolerance_plus
 
             elif "quintile" in key:
-                quintile_re = re.compile(fr"([\d\.]+)\% are in the {key}")
+                quintile_re = re.compile(rf"([\d\.]+)\% are in the {key}")
 
                 data_point = float(quintile_re.search(data)[1])
 

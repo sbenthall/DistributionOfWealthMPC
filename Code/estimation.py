@@ -207,7 +207,6 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
 
 
 def get_spec_name(options):
-
     # Construct the name of the specification from user options
     if options["param_name"] == "DiscFac":
         param_text = "beta"
@@ -242,7 +241,6 @@ def get_spec_name(options):
 
 
 def get_param_count(options):
-
     if options["do_param_dist"]:
         param_count = 7  # Number of discrete beta types in beta-dist
     else:
@@ -252,7 +250,6 @@ def get_param_count(options):
 
 
 def get_hark_classes(options):
-
     if options["do_agg_shocks"]:
         agent_class = AggDoWAgent
         market_class = AggDoWMarket
@@ -303,7 +300,6 @@ def set_targets(options, params):
 
 
 def set_population(options, params):
-
     # Set total number of simulated agents in the population
     if options["do_param_dist"]:
         if options["do_agg_shocks"]:
@@ -320,7 +316,6 @@ def set_population(options, params):
 
 
 def make_agents(options, params, agent_class, param_count):
-
     # Make AgentTypes for estimation
     if options["do_lifecycle"]:
         dropout_type = agent_class(**params.init_dropout)
@@ -353,7 +348,6 @@ def make_agents(options, params, agent_class, param_count):
 
 
 def set_up_economy(options, params, param_count):
-
     agent_class, market_class = get_hark_classes(options)
     agent_list = make_agents(options, params, agent_class, param_count)
 
@@ -398,7 +392,6 @@ def set_up_economy(options, params, param_count):
 
 
 def estimate(options, params):
-
     spec_name = get_spec_name(options)
     param_count = get_param_count(options)
     economy = set_up_economy(options, params, param_count)
@@ -440,7 +433,6 @@ def estimate(options, params):
                 center_estimate, spread_estimate = results.x
 
             else:
-
                 t_start = time()
                 spread_estimate = (
                     minimize_scalar(
@@ -505,7 +497,6 @@ def estimate(options, params):
 
 
 if __name__ == "__main__":
-
     import Code.calibration as parameters
     from Code.Options.all_options import all_options
 

@@ -137,10 +137,6 @@ Design decisions about whether to include this code explicitly,
 or import it, or execute it as is here, TBD.
 """
 
-here = os.path.dirname(os.path.realpath("cstwMPC.ipynb"))
-my_path = os.path.join(here, "")
-path_to_models = os.path.join(my_path, "Code")
-
 
 # %%
 # For speed here, use the "tractable" version of the model
@@ -259,7 +255,6 @@ do_agg_shocks = False  # Solve the FBS aggregate shocks version of the model
 # Matches liquid assets data when True, net worth data when False
 do_liquid = True
 do_tractable = False  #
-os.chdir(path_to_models)
 
 
 # %%
