@@ -14,36 +14,12 @@ all_options["DoStandardWork"] = {
 }
 
 """
-This options file establishes the main beta-dist specification in the paper:
-with heterogeneity, FBS-style aggregate shocks, perpetual youth model, matching net worth.
+This options file specifies parameter heterogeneity, making the choice in the paper:
+uniformly distributed discount factors.
 """
-all_options["MainSpecDist"] = {
-    "do_param_dist": True,  # Do param-dist version if True, param-point if False
-    "do_lifecycle": False,  # Use lifecycle model if True, perpetual youth if False
-    "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
-    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
-}
-
-"""
-This options file establishes the main beta-point specification in the paper:
-with heterogeneity, FBS-style aggregate shocks, perpetual youth model, matching net worth.
-"""
-all_options["MainSpecPoint"] = {
-    "do_param_dist": False,  # Do param-dist version if True, param-point if False
-    "do_lifecycle": False,  # Use lifecycle model if True, perpetual youth if False
-    "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
-    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
-}
-
-"""
-This options file establishes the second simplest model specification possible:
-with heterogeneity, no aggregate shocks, perpetual youth model, matching net worth.
-"""
-all_options["SimpleSpecDist"] = {
-    "do_param_dist": True,  # Do param-dist version if True, param-point if False
-    "do_lifecycle": False,  # Use lifecycle model if True, perpetual youth if False
-    "do_agg_shocks": False,  # Solve the FBS aggregate shocks version of the model
-    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
+all_options["UseUniformBetaDist"] = {
+    "param_name": "DiscFac",  # Which parameter to introduce heterogeneity in
+    "dist_type": "uniform",  # Which type of distribution to use
 }
 
 """
@@ -58,10 +34,36 @@ all_options["SimpleSpecPoint"] = {
 }
 
 """
-This options file specifies parameter heterogeneity, making the choice in the paper:
-uniformly distributed discount factors.
+This options file establishes the second simplest model specification possible:
+with heterogeneity, no aggregate shocks, perpetual youth model, matching net worth.
 """
-all_options["UseUniformBetaDist"] = {
-    "param_name": "DiscFac",  # Which parameter to introduce heterogeneity in
-    "dist_type": "uniform",  # Which type of distribution to use
+all_options["SimpleSpecDist"] = {
+    "do_param_dist": True,  # Do param-dist version if True, param-point if False
+    "do_lifecycle": False,  # Use lifecycle model if True, perpetual youth if False
+    "do_agg_shocks": False,  # Solve the FBS aggregate shocks version of the model
+    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
+}
+
+
+"""
+This options file establishes the main beta-point specification in the paper:
+with heterogeneity, FBS-style aggregate shocks, perpetual youth model, matching net worth.
+"""
+all_options["MainSpecPoint"] = {
+    "do_param_dist": False,  # Do param-dist version if True, param-point if False
+    "do_lifecycle": False,  # Use lifecycle model if True, perpetual youth if False
+    "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
+    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
+}
+
+
+"""
+This options file establishes the main beta-dist specification in the paper:
+with heterogeneity, FBS-style aggregate shocks, perpetual youth model, matching net worth.
+"""
+all_options["MainSpecDist"] = {
+    "do_param_dist": True,  # Do param-dist version if True, param-point if False
+    "do_lifecycle": False,  # Use lifecycle model if True, perpetual youth if False
+    "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
+    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
 }
