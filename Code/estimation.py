@@ -12,18 +12,21 @@ do_param_dist : bool
 do_lifecycle : bool
     Use lifecycle model if True, perpetual youth if False.
 do_agg_shocks : bool
-    Whether to solve the FBS aggregate shocks version of the model or use idiosyncratic shocks only.
+    Whether to solve the FBS aggregate shocks version of the model 
+    or use idiosyncratic shocks only.
 do_liquid : bool
     Matches liquid assets data when True, net worth data when False.
 do_tractable : bool
-    Whether to use an extremely simple alternate specification of households' optimization problem.
+    Whether to use an extremely simple alternate specification 
+    of households' optimization problem.
 run_estimation : bool
     Whether to actually estimate the model specified by the other options.
 run_sensitivity : [bool]
-    Whether to run each of eight sensitivity analyses; currently inoperative.  Order:
-    rho, xi_sigma, psi_sigma, mu, urate, mortality, g, R
+    Whether to run each of eight sensitivity analyses; currently inoperative.  
+    Order: rho, xi_sigma, psi_sigma, mu, urate, mortality, g, R
 find_beta_vs_KY : bool
-    Whether to computes K/Y ratio for a wide range of beta; should have do_param_dist = False and param_name = 'DiscFac'.
+    Whether to computes K/Y ratio for a wide range of beta; should have 
+    do_param_dist = False and param_name = 'DiscFac'.
     Currently inoperative.
 path_to_models : str
     Absolute path to the location of this file.
@@ -37,7 +40,7 @@ from time import time
 
 import numpy as np
 from HARK.utilities import get_lorenz_shares
-from scipy.optimize import minimize_scalar, root_scalar, minimize
+from scipy.optimize import minimize, minimize_scalar, root_scalar
 
 from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
@@ -238,14 +241,14 @@ def get_spec_name(options):
     return spec_name
 
 
-def get_pref_count(options):
+def get_param_count(options):
 
     if options["do_param_dist"]:
-        pref_count = 7  # Number of discrete beta types in beta-dist
+        param_count = 7  # Number of discrete beta types in beta-dist
     else:
-        pref_count = 1  # Just one beta type in beta-point
+        param_count = 1  # Just one beta type in beta-point
 
-    return pref_count
+    return param_count
 
 
 def get_hark_classes(options):
@@ -316,7 +319,7 @@ def set_population(options, params):
     return population
 
 
-def make_agents(options, params, agent_class, pref_count):
+def make_agents(options, params, agent_class, param_count):
 
     # Make AgentTypes for estimation
     if options["do_lifecycle"]:
@@ -332,7 +335,7 @@ def make_agents(options, params, agent_class, pref_count):
         highschool_type.update()
         college_type.update()
         agent_list = []
-        for n in range(pref_count):
+        for n in range(param_count):
             agent_list.append(deepcopy(dropout_type))
             agent_list.append(deepcopy(highschool_type))
             agent_list.append(deepcopy(college_type))
@@ -343,16 +346,16 @@ def make_agents(options, params, agent_class, pref_count):
             perpetualyouth_type = agent_class(**params.init_infinite)
         perpetualyouth_type.AgeDstn = np.array(1.0)
         agent_list = []
-        for n in range(pref_count):
+        for n in range(param_count):
             agent_list.append(deepcopy(perpetualyouth_type))
 
     return agent_list
 
 
-def set_up_economy(options, params, pref_count):
+def set_up_economy(options, params, param_count):
 
     agent_class, market_class = get_hark_classes(options)
-    agent_list = make_agents(options, params, agent_class, pref_count)
+    agent_list = make_agents(options, params, agent_class, param_count)
 
     # Give all the AgentTypes different seeds
     for j, agent in enumerate(agent_list):
@@ -369,19 +372,25 @@ def set_up_economy(options, params, pref_count):
         economy.LorenzData,
         economy.KYratioTarget,
     ) = set_targets(options, params)
+
     if options["do_lifecycle"]:
-        economy.assign_parameters(PopGroFac=params.PopGroFac)
-        economy.assign_parameters(TypeWeight=params.TypeWeight_lifecycle)
-        economy.assign_parameters(T_retire=params.working_T - 1)
-        economy.assign_parameters(act_T=params.T_sim_LC)
-        economy.assign_parameters(ignore_periods=params.ignore_periods_LC)
+        economy.assign_parameters(
+            PopGroFac=params.PopGroFac,
+            TypeWeight=params.TypeWeight_lifecycle,
+            T_retire=params.working_T - 1,
+            act_T=params.T_sim_LC,
+            ignore_periods=params.ignore_periods_LC,
+        )
     else:
-        economy.assign_parameters(PopGroFac=1.0)
-        economy.assign_parameters(TypeWeight=[1.0])
-        economy.assign_parameters(act_T=params.T_sim_PY)
-        economy.assign_parameters(ignore_periods=params.ignore_periods_PY)
+        economy.assign_parameters(
+            PopGroFac=1.0,
+            TypeWeight=[1.0],
+            act_T=params.T_sim_PY,
+            ignore_periods=params.ignore_periods_PY,
+        )
+
     if options["do_agg_shocks"]:
-        economy(**params.aggregate_params)
+        economy.assign_parameters(**params.aggregate_params)
         economy.update()
         economy.make_AggShkHist()
 
@@ -391,9 +400,8 @@ def set_up_economy(options, params, pref_count):
 def estimate(options, params):
 
     spec_name = get_spec_name(options)
-    pref_count = get_pref_count(options)
-
-    economy = set_up_economy(options, params, pref_count)
+    param_count = get_param_count(options)
+    economy = set_up_economy(options, params, param_count)
 
     # Estimate the model as requested
     if options["run_estimation"]:
@@ -421,7 +429,7 @@ def estimate(options, params):
                     args=(
                         economy,
                         options["param_name"],
-                        pref_count,
+                        param_count,
                         options["dist_type"],
                     ),
                     bounds=[param_range, spread_range],
@@ -441,7 +449,7 @@ def estimate(options, params):
                         args=(
                             economy,
                             options["param_name"],
-                            pref_count,
+                            param_count,
                             param_range,
                             options["dist_type"],
                         ),
@@ -460,7 +468,7 @@ def estimate(options, params):
                 args=(
                     economy,
                     options["param_name"],
-                    pref_count,
+                    param_count,
                     0.0,
                     options["dist_type"],
                 ),
@@ -472,11 +480,11 @@ def estimate(options, params):
             t_end = time()
 
         # Display statistics about the estimated model
-        economy.assign_parameters(LorenzBool=True)
-        economy.assign_parameters(ManyStatsBool=True)
+        economy.assign_parameters(LorenzBool=True, ManyStatsBool=True)
+
         economy.distribute_params(
             options["param_name"],
-            pref_count,
+            param_count,
             center_estimate,
             spread_estimate,
             options["dist_type"],
@@ -491,9 +499,7 @@ def estimate(options, params):
         economy.center_estimate = center_estimate
         economy.spread_estimate = spread_estimate
         economy.show_many_stats(spec_name)
-        print(
-            "These results have been saved to ./Code/Results/" + spec_name + ".txt\n\n"
-        )
+        print(f"These results have been saved to ./Code/Results/{spec_name}.txt\n\n")
 
     return economy
 

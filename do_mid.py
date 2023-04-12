@@ -22,6 +22,7 @@ estimate(point_options, parameters)
 # Run beta-dist model
 
 dist_options = basic_options.copy()
+dist_options["do_combo_estimation"] = True
 dist_options.update(all_options["MainSpecDist"])
 
 estimate(dist_options, parameters)

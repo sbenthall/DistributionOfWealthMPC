@@ -60,41 +60,33 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
     A class for representing the economy in the cstwMPC model.
     """
 
-    reap_vars = ["aLvl", "pLvl", "MPCnow", "TranShk", "EmpNow", "t_age"]
-    sow_vars = (
-        []
-    )  # Nothing needs to be sent back to agents in the idiosyncratic shocks version
-    const_vars = []  # ['LorenzBool','ManyStatsBool']
-    track_vars = [
-        "MaggNow",
-        "AaggNow",
-        "KtoYnow",
-        "Lorenz",
-        "LorenzLong",
-        "MPCall",
-        "MPCretired",
-        "MPCemployed",
-        "MPCunemployed",
-        "MPCbyIncome",
-        "MPCbyWealthRatio",
-        "HandToMouthPct",
-    ]
-    dyn_vars = []  # No dynamics in the idiosyncratic shocks version
-
     def __init__(self, **kwds):
         """
         Make a new instance of CstwMPCMarket.
         """
-        super().__init__(
-            sow_vars=self.sow_vars,
-            reap_vars=self.reap_vars,
-            const_vars=self.const_vars,
-            track_vars=self.track_vars,
-            dyn_vars=self.dyn_vars,
-        )
-        self.assign_parameters(**kwds)
-        if self.AggShockBool:
-            self.sow_vars = [
+
+        reap_vars = ["aLvl", "pLvl", "MPCnow", "TranShk", "EmpNow", "t_age"]
+        # Nothing needs to be sent back to agents in the idiosyncratic shocks version
+        sow_vars = []
+        const_vars = []  # ['LorenzBool','ManyStatsBool']
+        track_vars = [
+            "MaggNow",
+            "AaggNow",
+            "KtoYnow",
+            "Lorenz",
+            "LorenzLong",
+            "MPCall",
+            "MPCretired",
+            "MPCemployed",
+            "MPCunemployed",
+            "MPCbyIncome",
+            "MPCbyWealthRatio",
+            "HandToMouthPct",
+        ]
+        dyn_vars = []  # No dynamics in the idiosyncratic shocks version
+
+        if kwds.get("AggShockBool", False):
+            sow_vars = [
                 "MaggNow",
                 "AaggNow",
                 "RfreeNow",
@@ -103,7 +95,17 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
                 "TranShkAggNow",
                 "KtoLnow",
             ]
-            self.dyn_vars = ["AFunc"]
+            dyn_vars = ["AFunc"]
+
+        super().__init__(
+            sow_vars=sow_vars,
+            reap_vars=reap_vars,
+            const_vars=const_vars,
+            track_vars=track_vars,
+            dyn_vars=dyn_vars,
+        )
+        self.assign_parameters(**kwds)
+        if self.AggShockBool:
             self.max_loops = 20
 
         self.center_save = None
@@ -117,7 +119,7 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
         """
         if self.AggShockBool:
             for agent in self.agents:
-                agent.getEconomyData(self)
+                agent.get_economy_data(self)
             Market.solve(self)
         else:
             self.solve_agents()
@@ -178,7 +180,7 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
         )
 
         if self.AggShockBool:
-            return self.calcRandW(aLvl, pLvl)
+            return self.calc_R_and_W(aLvl, pLvl)
         else:  # These variables are tracked but not created in no-agg-shocks specifications
             self.MaggNow = 0.0
             self.AaggNow = 0.0

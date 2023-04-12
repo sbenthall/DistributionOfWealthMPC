@@ -9,4 +9,5 @@ dependencies:
   - econ-ark
   - pip
   - pip:
-      - econ-ark>=0.13.0
+      - git+https://github.com/alanlujan91/HARK@market_bug
+prefix: ./env
