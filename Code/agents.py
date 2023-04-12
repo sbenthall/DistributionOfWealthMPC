@@ -526,7 +526,7 @@ class CstwMPCMarket(Market):  # EstimationMarketClass
         # Save results to disk
         if spec_name is not None:
             with open(
-                self.my_file_path + "/Results/" + spec_name + "Results.txt",
+                self.my_file_path + "/results/" + spec_name + "Results.txt",
                 "w",
                 encoding="utf-8",
             ) as f:

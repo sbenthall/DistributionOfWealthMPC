@@ -1,6 +1,6 @@
 """
 This module makes some figures for cstwMPC.  It requires that quite a few specifications
-of the model have been estimated, with the results stored in ./Results.
+of the model have been estimated, with the results stored in ./results.
 """
 
 import matplotlib.pyplot as plt
@@ -12,7 +12,7 @@ import os
 my_file_path = os.path.dirname(os.path.abspath(__file__))
 
 
-f = open(my_file_path + "/Results/LCbetaPointNetWorthLorenzFig.txt")
+f = open(my_file_path + "/results/LCbetaPointNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 lorenz_percentiles = []
@@ -27,7 +27,7 @@ lorenz_percentiles = np.array(lorenz_percentiles)
 scf_lorenz = np.array(scf_lorenz)
 beta_point_lorenz = np.array(beta_point_lorenz)
 
-f = open(my_file_path + "/Results/LCbetaDistNetWorthLorenzFig.txt")
+f = open(my_file_path + "/results/LCbetaDistNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_dist_lorenz = []
@@ -36,7 +36,7 @@ for j in range(len(raw_data)):
 f.close()
 beta_dist_lorenz = np.array(beta_dist_lorenz)
 
-f = open(my_file_path + "/Results/LCbetaPointNetWorthMPCfig.txt")
+f = open(my_file_path + "/results/LCbetaPointNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_percentiles = []
@@ -48,7 +48,7 @@ f.close()
 mpc_percentiles = np.asarray(mpc_percentiles)
 mpc_beta_point = np.asarray(mpc_beta_point)
 
-f = open(my_file_path + "/Results/LCbetaDistNetWorthMPCfig.txt")
+f = open(my_file_path + "/results/LCbetaDistNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist = []
@@ -57,7 +57,7 @@ for j in range(len(raw_data)):
 f.close()
 mpc_beta_dist = np.asarray(mpc_beta_dist)
 
-f = open(my_file_path + "/Results/LCbetaDistLiquidMPCfig.txt")
+f = open(my_file_path + "/results/LCbetaDistLiquidMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist_liquid = []
@@ -66,7 +66,7 @@ for j in range(len(raw_data)):
 f.close()
 mpc_beta_dist_liquid = np.asarray(mpc_beta_dist_liquid)
 
-f = open(my_file_path + "/Results/LCbetaDistNetWorthKappaByAge.txt")
+f = open(my_file_path + "/results/LCbetaDistNetWorthKappaByAge.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 kappa_mean_age = []
@@ -82,7 +82,7 @@ kappa_hi_beta_age = np.array(kappa_hi_beta_age)
 age_list = np.array(list(range(len(kappa_mean_age))), dtype=float) * 0.25 + 24.0
 f.close()
 
-f = open(my_file_path + "/Results/LC_KYbyBeta.txt")
+f = open(my_file_path + "/results/LC_KYbyBeta.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 KY_by_beta_lifecycle = []
@@ -94,7 +94,7 @@ beta_list = np.array(beta_list)
 KY_by_beta_lifecycle = np.array(KY_by_beta_lifecycle)
 f.close()
 
-f = open(my_file_path + "/Results/IH_KYbyBeta.txt")
+f = open(my_file_path + "/results/IH_KYbyBeta.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 KY_by_beta_infinite = []
@@ -152,7 +152,7 @@ plt.savefig(my_file_path + "/Figures/KYratioByBeta.pdf")
 plt.show()
 
 
-f = open(my_file_path + "/Results/IHbetaPointNetWorthLorenzFig.txt")
+f = open(my_file_path + "/results/IHbetaPointNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 lorenz_percentiles = []
@@ -167,7 +167,7 @@ lorenz_percentiles = np.array(lorenz_percentiles)
 scf_lorenz = np.array(scf_lorenz)
 beta_point_lorenz = np.array(beta_point_lorenz)
 
-f = open(my_file_path + "/Results/IHbetaDistNetWorthLorenzFig.txt")
+f = open(my_file_path + "/results/IHbetaDistNetWorthLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_dist_lorenz = []
@@ -177,7 +177,7 @@ f.close()
 beta_dist_lorenz = np.array(beta_dist_lorenz)
 
 
-f = open(my_file_path + "/Results/IHbetaPointLiquidLorenzFig.txt")
+f = open(my_file_path + "/results/IHbetaPointLiquidLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_point_lorenz_liquid = []
@@ -186,7 +186,7 @@ for j in range(len(raw_data)):
 f.close()
 beta_point_lorenz_liquid = np.array(beta_point_lorenz_liquid)
 
-f = open(my_file_path + "/Results/IHbetaDistLiquidLorenzFig.txt")
+f = open(my_file_path + "/results/IHbetaDistLiquidLorenzFig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 beta_dist_lorenz_liquid = []
@@ -195,7 +195,7 @@ for j in range(len(raw_data)):
 f.close()
 beta_dist_lorenz_liquid = np.array(beta_dist_lorenz_liquid)
 
-f = open(my_file_path + "/Results/IHbetaPointNetWorthMPCfig.txt")
+f = open(my_file_path + "/results/IHbetaPointNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_percentiles = []
@@ -207,7 +207,7 @@ f.close()
 mpc_percentiles = np.asarray(mpc_percentiles)
 mpc_beta_point = np.asarray(mpc_beta_point)
 
-f = open(my_file_path + "/Results/IHbetaDistNetWorthMPCfig.txt")
+f = open(my_file_path + "/results/IHbetaDistNetWorthMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist = []
@@ -216,7 +216,7 @@ for j in range(len(raw_data)):
 f.close()
 mpc_beta_dist = np.asarray(mpc_beta_dist)
 
-f = open(my_file_path + "/Results/IHbetaDistLiquidMPCfig.txt")
+f = open(my_file_path + "/results/IHbetaDistLiquidMPCfig.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mpc_beta_dist_liquid = []
@@ -276,43 +276,43 @@ plt.savefig(my_file_path + "/Figures/MPCdistInfinite.pdf")
 plt.show()
 
 
-f = open(my_file_path + "/Results/SensitivityRho.txt")
+f = open(my_file_path + "/results/SensitivityRho.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 rho_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityXiSigma.txt")
+f = open(my_file_path + "/results/SensitivityXiSigma.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 xi_sigma_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityPsiSigma.txt")
+f = open(my_file_path + "/results/SensitivityPsiSigma.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 psi_sigma_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityMu.txt")
+f = open(my_file_path + "/results/SensitivityMu.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mu_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityUrate.txt")
+f = open(my_file_path + "/results/SensitivityUrate.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 urate_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityMortality.txt")
+f = open(my_file_path + "/results/SensitivityMortality.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 mortality_sensitivity = np.array(raw_data)
 f.close()
 
-f = open(my_file_path + "/Results/SensitivityG.txt")
+f = open(my_file_path + "/results/SensitivityG.txt")
 my_reader = csv.reader(f, delimiter="\t")
 raw_data = list(my_reader)
 g_sensitivity = np.array(raw_data)

@@ -67,3 +67,17 @@ all_options["MainSpecDist"] = {
     "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
     "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
 }
+
+all_options["LCSpecPoint"] = {
+    "do_param_dist": False,  # Do param-dist version if True, param-point if False
+    "do_lifecycle": True,  # Use lifecycle model if True, perpetual youth if False
+    "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
+    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
+}
+
+all_options["LCSpecDist"] = {
+    "do_param_dist": True,  # Do param-dist version if True, param-point if False
+    "do_lifecycle": True,  # Use lifecycle model if True, perpetual youth if False
+    "do_agg_shocks": True,  # Solve the FBS aggregate shocks version of the model
+    "do_liquid": False,  # Matches liquid assets data when True, net worth data when False
+}

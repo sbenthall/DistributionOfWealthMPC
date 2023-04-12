@@ -42,11 +42,7 @@ import numpy as np
 from HARK.utilities import get_lorenz_shares
 from scipy.optimize import minimize, minimize_scalar, root_scalar
 
-from Code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
-
-
-def mystr(number):
-    return f"{number:.3f}"
+from code.agents import AggDoWAgent, AggDoWMarket, DoWAgent, DoWMarket
 
 
 def get_ky_ratio_difference(
@@ -145,7 +141,7 @@ def find_lorenz_distance_at_target_ky(
 
 
 def get_target_ky_and_find_lorenz_distance(
-    x, economy=None, param_name=None, param_count=None, dist_type=None
+    x, economy, param_name, param_count, dist_type
 ):
     center, spread = x
     # Make sure we actually calculate simulated Lorenz points
@@ -192,7 +188,7 @@ def calc_stationary_age_dstn(LivPrb, terminal_period):
     for t in range(top):
         MrkvArray[t, 0] = 1.0 - LivPrb[t]
         MrkvArray[t, t + 1] = LivPrb[t]
-    MrkvArray[t + 1, 0] = 1.0
+        MrkvArray[t + 1, 0] = 1.0
 
     w, v = np.linalg.eig(np.transpose(MrkvArray))
     idx = (np.abs(w - 1.0)).argmin()
@@ -321,10 +317,10 @@ def make_agents(options, params, agent_class, param_count):
         dropout_type = agent_class(**params.init_dropout)
         dropout_type.AgeDstn = calc_stationary_age_dstn(dropout_type.LivPrb, True)
         highschool_type = deepcopy(dropout_type)
-        highschool_type(**params.adj_highschool)
+        highschool_type.assign_parameters(**params.adj_highschool)
         highschool_type.AgeDstn = calc_stationary_age_dstn(highschool_type.LivPrb, True)
         college_type = deepcopy(dropout_type)
-        college_type(**params.adj_college)
+        college_type.assign_parameters(**params.adj_college)
         college_type.AgeDstn = calc_stationary_age_dstn(college_type.LivPrb, True)
         dropout_type.update()
         highschool_type.update()
@@ -491,14 +487,23 @@ def estimate(options, params):
         economy.center_estimate = center_estimate
         economy.spread_estimate = spread_estimate
         economy.show_many_stats(spec_name)
-        print(f"These results have been saved to ./Code/Results/{spec_name}.txt\n\n")
+        print(f"These results have been saved to ./code/results/{spec_name}.txt\n\n")
 
     return economy
 
 
+class Estimator:
+    def __init__(self, options, parameters):
+        self.options = options
+        self.parameters = parameters
+
+    def estimate(self):
+        return estimate(self.options, self.parameters)
+
+
 if __name__ == "__main__":
-    import Code.calibration as parameters
-    from Code.Options.all_options import all_options
+    import code.calibration as parameters
+    from code.options.all_options import all_options
 
     basic_options = all_options["UseUniformBetaDist"].copy()
     basic_options.update(all_options["DoStandardWork"])

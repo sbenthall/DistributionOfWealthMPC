@@ -5,9 +5,9 @@ Will run both beta-point and beta-dist versions.
 """
 
 
-import Code.calibration as parameters
-from Code.estimation import estimate
-from Code.Options.all_options import all_options
+import code.calibration as parameters
+from code.estimation import estimate
+from code.options.all_options import all_options
 
 basic_options = all_options["UseUniformBetaDist"].copy()
 basic_options.update(all_options["DoStandardWork"])

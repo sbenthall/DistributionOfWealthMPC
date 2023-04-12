@@ -2,8 +2,8 @@
 This module runs a custom model specification, with all options specified by the user.
 """
 
-import Code.calibration as parameters
-from Code.estimation import estimate
+import code.calibration as parameters
+from code.estimation import estimate
 
 param_name = "DiscFac"  # Which parameter to introduce heterogeneity in
 dist_type = "uniform"  # Which type of distribution to use

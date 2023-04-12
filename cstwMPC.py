@@ -24,17 +24,15 @@
 # %% code_folding=[]
 # This cell does some standard python setup!
 
-import os  # Tools for navigating the filesystem
+import code.calibration as parameters
 import warnings  # The warnings package allows us to ignore some harmless but alarming warning messages
+from code.calibration import SCF_wealth, SCF_weights
+from code.estimation import estimate
 
 # Import related generic python packages
 import matplotlib.pyplot as plt  # Plotting tools
 import numpy as np
 from HARK.utilities import get_lorenz_shares
-
-import Code.calibration as parameters
-from Code.calibration import SCF_wealth, SCF_weights
-from Code.estimation import estimate
 
 warnings.filterwarnings("ignore")
 

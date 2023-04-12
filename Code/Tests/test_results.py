@@ -1,8 +1,8 @@
 """
 To be run after `do_min.py`.
-Depends on having files in Results.
+Depends on having files in results.
 
-Will test the output files in Results for similarity with the results in the original
+Will test the output files in results for similarity with the results in the original
 cstwMPC paper.
 """
 import pathlib
@@ -128,7 +128,7 @@ quintile_tolerance_plus = 7
 
 for filename, targets in results_files_and_targets.items():
     with open(
-        pathlib.PurePath(pathlib.Path(__file__).parent, "../Results", filename),
+        pathlib.PurePath(pathlib.Path(__file__).parent, "../results", filename),
         encoding="utf-8",
     ) as f:
         data = f.read()
