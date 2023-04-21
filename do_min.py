@@ -1,26 +1,28 @@
-'''
+"""
 This file will run the absolute minimum amount of work that actually produces
 relevant output-- no aggregate shocks, perpetual youth, matching net worth.
 Will run both beta-point and beta-dist versions.
-'''
-import os
+"""
 
 
-from Code.Options.all_options import all_options
-import Code.SetupParamsCSTW as Params
-from Code.cstwMPC_MAIN import main # TODO better name for this
+import code.calibration as parameters
+from code.estimation import estimate
+from code.options.all_options import all_options
 
-basic_options = all_options['UseUniformBetaDist'].copy()
-basic_options.update(all_options['DoStandardWork'])
+basic_options = all_options["UseUniformBetaDist"].copy()
+basic_options.update(all_options["DoStandardWork"])
 
+# Run beta-point model
 
-options = basic_options.copy()
-options.update(all_options['SimpleSpecPoint'])
+simple_point = basic_options.copy()
+simple_point.update(all_options["SimpleSpecPoint"])
 
-main(options, Params)
+estimate(simple_point, parameters)
 
-options = basic_options.copy()
+# Run beta-dist model
 
-options.update(all_options['SimpleSpecDist'])
+simple_dist = basic_options.copy()
+simple_dist["do_combo_estimation"] = True
+simple_dist.update(all_options["SimpleSpecDist"])
 
-main(options, Params)
+estimate(simple_dist, parameters)

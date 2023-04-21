@@ -1,5 +1,3 @@
-matplotlib==3.7.0
-dill==0.3.3
-future==0.18.2
-econ-ark==0.13.0
-ipython==8.8.0
+econ-ark>=0.13.0
+matplotlib>=3.7.0
+ipython>=8.8.0
