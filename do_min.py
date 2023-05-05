@@ -1,27 +1,28 @@
-'''
+"""
 This file will run the absolute minimum amount of work that actually produces
 relevant output-- no aggregate shocks, perpetual youth, matching net worth.
 Will run both beta-point and beta-dist versions.
-'''
-import os
+"""
 
-here = os.path.dirname(os.path.realpath(__file__))
-my_path = os.path.join(here,'')
-path_to_models = os.path.join(my_path,'Code')
-path_to_options = os.path.join(path_to_models,'Options')
 
-# Set up basic options
-os.chdir(path_to_options)
-exec(open('UseUniformBetaDist.py').read())
-exec(open('DoStandardWork.py').read())
+import code.calibration as parameters
+from code.estimation import estimate
+from code.options.all_options import all_options
+
+basic_options = all_options["UseUniformBetaDist"].copy()
+basic_options.update(all_options["DoStandardWork"])
 
 # Run beta-point model
-exec(open('SimpleSpecPoint.py').read())
-os.chdir(path_to_models)
-exec(open('cstwMPC_MAIN.py').read())
+
+simple_point = basic_options.copy()
+simple_point.update(all_options["SimpleSpecPoint"])
+
+estimate(simple_point, parameters)
 
 # Run beta-dist model
-os.chdir(path_to_options)
-exec(open('SimpleSpecDist.py').read())
-os.chdir(path_to_models)
-exec(open('cstwMPC_MAIN.py').read())
+
+simple_dist = basic_options.copy()
+simple_dist["do_combo_estimation"] = True
+simple_dist.update(all_options["SimpleSpecDist"])
+
+estimate(simple_dist, parameters)
